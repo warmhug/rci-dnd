@@ -26,9 +26,9 @@ const dTarget = {
 
     const bIndex = props.bIndex;
     const hoverIndex = props.index;
-
+console.log(monitor.canDrop());
     // Don't replace items with themselves
-    if (dragIndex === hoverIndex && dragBIndex === bIndex) {
+    if (dragBIndex === bIndex && dragIndex === hoverIndex) {
       return;
     }
 
@@ -43,7 +43,7 @@ const dTarget = {
 
     // Get pixels to the top
     const hoverClientY = clientOffset.y - hoverBoundingRect.top;
-
+console.log(hoverClientY, hoverMiddleY, dragIndex, hoverIndex);
     // Only perform the move when the mouse has crossed half of the items height
     // When dragging downwards, only move when the cursor is below 50%
     // When dragging upwards, only move when the cursor is above 50%
@@ -56,6 +56,12 @@ const dTarget = {
     // Dragging upwards
     if (dragIndex > hoverIndex && hoverClientY > hoverMiddleY) {
       return;
+    }
+
+    if (dragBIndex !== bIndex) {
+      if (hoverClientY < hoverMiddleY) {
+        return
+      }
     }
 
     // Time to actually perform the action

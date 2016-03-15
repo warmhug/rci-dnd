@@ -51,7 +51,7 @@ class Dnd extends Component {
   render() {
     const { blocks } = this.state;
     console.log('xx', blocks);
-    return (<div className="container">
+    return (<div className="dnd-container">
       {blocks.map((block, index) => {
         return (<div key={index} className="block">
           {block.cards.map((card, i) => {
