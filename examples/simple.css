@@ -1,10 +1,10 @@
-.container {
+.dnd-container {
   display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
   display: flex;
 }
-.container .block {
+.dnd-container .block {
   -webkit-box-flex: 1;
   -webkit-flex: 1;
       -ms-flex: 1;
@@ -13,7 +13,7 @@
   padding: 10px;
   margin: 0 10px 0 0;
 }
-.container .card {
+.dnd-container .card {
   border: 1px solid #ddd;
   margin: 3px 0;
 }

@@ -19765,7 +19765,7 @@ webpackJsonp([0,1],[
 	      console.log('xx', blocks);
 	      return _react2.default.createElement(
 	        'div',
-	        { className: 'container' },
+	        { className: 'dnd-container' },
 	        blocks.map(function (block, index) {
 	          return _react2.default.createElement(
 	            'div',
@@ -27557,9 +27557,9 @@ webpackJsonp([0,1],[
 	
 	    var bIndex = props.bIndex;
 	    var hoverIndex = props.index;
-	
+	    console.log(monitor.canDrop());
 	    // Don't replace items with themselves
-	    if (dragIndex === hoverIndex && dragBIndex === bIndex) {
+	    if (dragBIndex === bIndex && dragIndex === hoverIndex) {
 	      return;
 	    }
 	
@@ -27574,7 +27574,7 @@ webpackJsonp([0,1],[
 	
 	    // Get pixels to the top
 	    var hoverClientY = clientOffset.y - hoverBoundingRect.top;
-	
+	    console.log(hoverClientY, hoverMiddleY, dragIndex, hoverIndex);
 	    // Only perform the move when the mouse has crossed half of the items height
 	    // When dragging downwards, only move when the cursor is below 50%
 	    // When dragging upwards, only move when the cursor is above 50%
@@ -27587,6 +27587,12 @@ webpackJsonp([0,1],[
 	    // Dragging upwards
 	    if (dragIndex > hoverIndex && hoverClientY > hoverMiddleY) {
 	      return;
+	    }
+	
+	    if (dragBIndex !== bIndex) {
+	      if (hoverClientY < hoverMiddleY) {
+	        return;
+	      }
 	    }
 	
 	    // Time to actually perform the action

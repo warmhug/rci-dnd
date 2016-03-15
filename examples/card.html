@@ -292,9 +292,9 @@ Monokai Sublime style. Derived from Monokai by noformnocontent http://nn.mit-lic
 
     <span class="hljs-keyword">const</span> bIndex = props.bIndex;
     <span class="hljs-keyword">const</span> hoverIndex = props.index;
-
+<span class="hljs-built_in">console</span>.log(monitor.canDrop());
     <span class="hljs-comment">// Don't replace items with themselves</span>
-    <span class="hljs-keyword">if</span> (dragIndex === hoverIndex &amp;&amp; dragBIndex === bIndex) {
+    <span class="hljs-keyword">if</span> (dragBIndex === bIndex &amp;&amp; dragIndex === hoverIndex) {
       <span class="hljs-keyword">return</span>;
     }
 
@@ -309,7 +309,7 @@ Monokai Sublime style. Derived from Monokai by noformnocontent http://nn.mit-lic
 
     <span class="hljs-comment">// Get pixels to the top</span>
     <span class="hljs-keyword">const</span> hoverClientY = clientOffset.y - hoverBoundingRect.top;
-
+<span class="hljs-built_in">console</span>.log(hoverClientY, hoverMiddleY, dragIndex, hoverIndex);
     <span class="hljs-comment">// Only perform the move when the mouse has crossed half of the items height</span>
     <span class="hljs-comment">// When dragging downwards, only move when the cursor is below 50%</span>
     <span class="hljs-comment">// When dragging upwards, only move when the cursor is above 50%</span>
@@ -322,6 +322,12 @@ Monokai Sublime style. Derived from Monokai by noformnocontent http://nn.mit-lic
     <span class="hljs-comment">// Dragging upwards</span>
     <span class="hljs-keyword">if</span> (dragIndex &gt; hoverIndex &amp;&amp; hoverClientY &gt; hoverMiddleY) {
       <span class="hljs-keyword">return</span>;
+    }
+
+    <span class="hljs-keyword">if</span> (dragBIndex !== bIndex) {
+      <span class="hljs-keyword">if</span> (hoverClientY &lt; hoverMiddleY) {
+        <span class="hljs-keyword">return</span>
+      }
     }
 
     <span class="hljs-comment">// Time to actually perform the action</span>

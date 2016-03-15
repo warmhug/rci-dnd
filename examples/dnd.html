@@ -317,7 +317,7 @@ class Dnd extends Component {
   render() {
     const { blocks } = this.state;
     console.log('xx', blocks);
-    return (&lt;div className="container"&gt;
+    return (&lt;div className="dnd-container"&gt;
       {blocks.map((block, index) =&gt; {
         return (&lt;div key={index} className="block"&gt;
           {block.cards.map((card, i) =&gt; {
