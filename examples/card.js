@@ -13,15 +13,13 @@ const dSource = {
       index: props.index,
       bIndex: props.bIndex
     };
-  },
-  isDragging(props, monitor) {
-    const item = monitor.getItem();
-    // console.log(item);
-    return true;
   }
 };
 
 const dTarget = {
+  drop(props, monitor, component) {
+    console.log(component);
+  },
   hover(props, monitor, component) {
     const dragInfo = monitor.getItem();
     const dragIndex = dragInfo.index;
@@ -62,7 +60,8 @@ const dTarget = {
     }
 
     if (dragBIndex !== bIndex) {
-      console.log('xxx');
+      // console.log(component);
+      // console.log('xxx');
       if (hoverClientY <= hoverMiddleY) {
         hoverIndex -= 1;
         hoverIndex = hoverIndex < 0 ? 0 : hoverIndex;
@@ -72,6 +71,8 @@ const dTarget = {
       if (beginDrag) {
         props.moveCard(dragBIndex, dragIndex, bIndex, hoverIndex);
         beginDrag = false;
+      } else {
+        component.setState({hide: true});
       }
       return;
     }
@@ -89,13 +90,19 @@ const dTarget = {
 };
 
 class Card extends Component {
+  constructor(props) {
+    super(props);
+    // this.state = {
+    //   hide: false,
+    // };
+  }
   render() {
-    const { isDragging, isOver, text, connectDragSource, connectDropTarget } = this.props;
+    const { isDragging, hide, isOver, text, connectDragSource, connectDropTarget } = this.props;
     return connectDragSource(connectDropTarget(
       <div className="card" style={{
         fontSize: 24,
         cursor: 'move',
-        opacity: isDragging ? 0.5 : 1,
+        opacity: isDragging || hide ? 0 : 1,
         backgroundColor: isOver ? 'red' : ''
       }}>
         {text}
@@ -109,12 +116,13 @@ export default flow(
     return {
       connectDragSource: connect.dragSource(),
       // connectDragPreview: connect.dragPreview(),
-      isDragging: monitor.isDragging()
+      isDragging: monitor.isDragging(),
+      hide: false,
     };
   }),
   DropTarget('dnd', dTarget, (connect, monitor) => ({
     connectDropTarget: connect.dropTarget(),
     isOver: monitor.isOver(),
-    canDrop: monitor.canDrop()
+    // canDrop: monitor.canDrop()
   }))
 )(Card);
