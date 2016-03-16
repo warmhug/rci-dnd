@@ -1,0 +1,18 @@
+li.placeholder {
+  background: #fff078;
+}
+li.placeholder:before {
+  content: "Drop here";
+  color: #e1d25a;
+}
+ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+li {
+  padding: 5px;
+  background: #eee;
+}
+
+/*# sourceMappingURL=pure.css.map*/
