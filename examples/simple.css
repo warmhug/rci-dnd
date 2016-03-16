@@ -17,5 +17,8 @@
   border: 1px solid #ddd;
   margin: 3px 0;
 }
+.dnd-container .infi-item {
+  height: 40px;
+}
 
 /*# sourceMappingURL=simple.css.map*/

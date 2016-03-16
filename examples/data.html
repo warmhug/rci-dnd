@@ -2,7 +2,7 @@
 <html>
 
 <head>
-  <title>dnd.js - example - react-dnd-demo@1.0.0</title>
+  <title>data.js - example - react-dnd-demo@1.0.0</title>
   <meta name="viewport"
         content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no">
   <meta charset="utf-8"/>
@@ -263,91 +263,33 @@ Monokai Sublime style. Derived from Monokai by noformnocontent http://nn.mit-lic
   </div>
   <div class="example" id="__react-content"></div>
   <script src="common.js?nowrap"></script>
-  <script src="dnd.js?nowrap"></script>
-  <div class="highlight"><pre><code language="undefined">import React, { Component } from 'react';
-import update from 'react/lib/update';
-import { DragDropContext } from 'react-dnd';
-import HTML5Backend from 'react-dnd-html5-backend';
-
-import blocks from './data';
-import Card from './card';
-
-// import InfiniteScrollFn from 'react-infinite-scroll';
-// const InfiniteScroll = InfiniteScrollFn(React);
-import Infinite from 'react-infinite';
-
-function buildElements(start, end) {
-  var elements = [];
-  for (var i = start; i &lt; end; i++) {
-    elements.push(&lt;div key={i} className="infi-item"&gt;
-      List Item {i}
-    &lt;/div&gt;);
+  <script src="data.js?nowrap"></script>
+  <div class="highlight"><pre><code language="js"><span class="hljs-keyword">export</span> <span class="hljs-keyword">default</span> [
+  {
+    cards: [{
+      id: <span class="hljs-number">1</span>,
+      text: <span class="hljs-string">'♘ 1'</span>
+    }, {
+      id: <span class="hljs-number">2</span>,
+      text: <span class="hljs-string">'♘ 2'</span>
+    }, {
+      id: <span class="hljs-number">3</span>,
+      text: <span class="hljs-string">'♘ 3'</span>
+    }, {
+      id: <span class="hljs-number">4</span>,
+      text: <span class="hljs-string">'♘ 4'</span>
+    }]
+  },
+  {
+    cards: [{
+      id: <span class="hljs-number">11</span>,
+      text: <span class="hljs-string">'♘ 11'</span>
+    }, {
+      id: <span class="hljs-number">22</span>,
+      text: <span class="hljs-string">'♘ 22'</span>
+    }]
   }
-  return elements;
-}
-
-class Dnd extends Component {
-  constructor(props) {
-    super(props);
-    this.moveCard = this.moveCard.bind(this);
-    this.state = {
-      blocks,
-      isInfiniteLoading: false,
-      elements: buildElements(0, 20),
-    };
-  }
-
-  handleInfiniteLoad() {
-    console.log('load');
-    this.setState({
-      isInfiniteLoading: true
-    });
-    setTimeout(() =&gt; {
-      var elemLength = this.state.elements.length,
-          newElements = buildElements(elemLength, elemLength + 30);
-      this.setState({
-        isInfiniteLoading: false,
-        elements: this.state.elements.concat(newElements)
-      });
-    }, 1000);
-  }
-
-  moveCard(dragBIndex, dragIndex, bIndex, hoverIndex) {
-    const blocks = [...this.state.blocks];
-    const removed = blocks[dragBIndex].cards.splice(dragIndex, 1);
-    blocks[bIndex].cards.splice(hoverIndex, 0, removed[0]);
-    console.log('xxxdd');
-    this.setState({blocks});
-  }
-
-  render() {
-    const { blocks } = this.state;
-    return (&lt;div className="dnd-container"&gt;
-      {blocks.map((block, index) =&gt; {
-        return (&lt;div key={index} className="block"&gt;
-          &lt;Infinite elementHeight={40}
-            containerHeight={250}
-            infiniteLoadBeginEdgeOffset={200}
-            onInfiniteLoad={this.handleInfiniteLoad.bind(this)}
-            loadingSpinnerDelegate={&lt;div className="infi-item"&gt;Loading...&lt;/div&gt;}
-            isInfiniteLoading={this.state.isInfiniteLoading}&gt;
-            {this.state.elements}
-          &lt;/Infinite&gt;
-          {block.cards.map((card, i) =&gt; {
-            return &lt;Card key={card.id}
-              bIndex={index}
-              index={i}
-              id={card.id}
-              text={card.text}
-              moveCard={this.moveCard} /&gt;
-          })}
-        &lt;/div&gt;);
-      })}
-    &lt;/div&gt;);
-  }
-}
-
-export default DragDropContext(HTML5Backend)(Dnd);
+];
 </code></pre></div>
 </div>
 <a href="https://github.com/react-component/react-dnd-demo">
