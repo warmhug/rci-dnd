@@ -3,8 +3,11 @@ import { findDOMNode } from 'react-dom';
 import { DragSource, DropTarget } from 'react-dnd';
 import flow from 'lodash/flow';
 
+let beginDrag = false;
+
 const dSource = {
   beginDrag(props) {
+    beginDrag = true;
     return {
       id: props.id,
       index: props.index,
@@ -25,8 +28,8 @@ const dTarget = {
     const dragBIndex = dragInfo.bIndex;
 
     const bIndex = props.bIndex;
-    const hoverIndex = props.index;
-console.log(monitor.canDrop());
+    let hoverIndex = props.index;
+
     // Don't replace items with themselves
     if (dragBIndex === bIndex && dragIndex === hoverIndex) {
       return;
@@ -43,7 +46,7 @@ console.log(monitor.canDrop());
 
     // Get pixels to the top
     const hoverClientY = clientOffset.y - hoverBoundingRect.top;
-console.log(hoverClientY, hoverMiddleY, dragIndex, hoverIndex);
+
     // Only perform the move when the mouse has crossed half of the items height
     // When dragging downwards, only move when the cursor is below 50%
     // When dragging upwards, only move when the cursor is above 50%
@@ -59,9 +62,18 @@ console.log(hoverClientY, hoverMiddleY, dragIndex, hoverIndex);
     }
 
     if (dragBIndex !== bIndex) {
-      if (hoverClientY < hoverMiddleY) {
-        return
+      console.log('xxx');
+      if (hoverClientY <= hoverMiddleY) {
+        hoverIndex -= 1;
+        hoverIndex = hoverIndex < 0 ? 0 : hoverIndex;
+      } else {
+        hoverIndex += 1;
       }
+      if (beginDrag) {
+        props.moveCard(dragBIndex, dragIndex, bIndex, hoverIndex);
+        beginDrag = false;
+      }
+      return;
     }
 
     // Time to actually perform the action
