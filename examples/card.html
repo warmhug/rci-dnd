@@ -269,22 +269,22 @@ Monokai Sublime style. Derived from Monokai by noformnocontent http://nn.mit-lic
 <span class="hljs-keyword">import</span> { DragSource, DropTarget } <span class="hljs-keyword">from</span> <span class="hljs-string">'react-dnd'</span>;
 <span class="hljs-keyword">import</span> flow <span class="hljs-keyword">from</span> <span class="hljs-string">'lodash/flow'</span>;
 
-<span class="hljs-keyword">let</span> beginDrag = <span class="hljs-literal">false</span>;
 
 <span class="hljs-keyword">const</span> dSource = {
   beginDrag(props) {
-    beginDrag = <span class="hljs-literal">true</span>;
     <span class="hljs-keyword">return</span> {
       id: props.id,
       index: props.index,
       bIndex: props.bIndex
     };
+  },
+  endDrag(props, monitor, component) {
+    props.endDrag();
   }
 };
 
 <span class="hljs-keyword">const</span> dTarget = {
   drop(props, monitor, component) {
-    <span class="hljs-built_in">console</span>.log(component);
   },
   hover(props, monitor, component) {
     <span class="hljs-keyword">const</span> dragInfo = monitor.getItem();
@@ -299,14 +299,19 @@ Monokai Sublime style. Derived from Monokai by noformnocontent http://nn.mit-lic
       <span class="hljs-keyword">return</span>;
     }
 
+    <span class="hljs-comment">// Determine mouse position</span>
+    <span class="hljs-keyword">const</span> clientOffset = monitor.getClientOffset();
+
     <span class="hljs-comment">// Determine rectangle on screen</span>
     <span class="hljs-keyword">const</span> hoverBoundingRect = findDOMNode(component).getBoundingClientRect();
 
+    <span class="hljs-keyword">if</span> (dragBIndex !== bIndex) {
+      props.moveCard(dragBIndex, dragIndex, bIndex, hoverIndex, hoverBoundingRect);
+      <span class="hljs-keyword">return</span>;
+    }
+
     <span class="hljs-comment">// Get vertical middle</span>
     <span class="hljs-keyword">const</span> hoverMiddleY = (hoverBoundingRect.bottom - hoverBoundingRect.top) / <span class="hljs-number">2</span>;
-
-    <span class="hljs-comment">// Determine mouse position</span>
-    <span class="hljs-keyword">const</span> clientOffset = monitor.getClientOffset();
 
     <span class="hljs-comment">// Get pixels to the top</span>
     <span class="hljs-keyword">const</span> hoverClientY = clientOffset.y - hoverBoundingRect.top;
@@ -319,33 +324,13 @@ Monokai Sublime style. Derived from Monokai by noformnocontent http://nn.mit-lic
     <span class="hljs-keyword">if</span> (dragIndex &lt; hoverIndex &amp;&amp; hoverClientY &lt; hoverMiddleY) {
       <span class="hljs-keyword">return</span>;
     }
-
     <span class="hljs-comment">// Dragging upwards</span>
     <span class="hljs-keyword">if</span> (dragIndex &gt; hoverIndex &amp;&amp; hoverClientY &gt; hoverMiddleY) {
       <span class="hljs-keyword">return</span>;
     }
 
-    <span class="hljs-keyword">if</span> (dragBIndex !== bIndex) {
-      <span class="hljs-comment">// console.log(component);</span>
-      <span class="hljs-comment">// console.log('xxx');</span>
-      <span class="hljs-keyword">if</span> (hoverClientY &lt;= hoverMiddleY) {
-        hoverIndex -= <span class="hljs-number">1</span>;
-        hoverIndex = hoverIndex &lt; <span class="hljs-number">0</span> ? <span class="hljs-number">0</span> : hoverIndex;
-      } <span class="hljs-keyword">else</span> {
-        hoverIndex += <span class="hljs-number">1</span>;
-      }
-      <span class="hljs-keyword">if</span> (beginDrag) {
-        props.moveCard(dragBIndex, dragIndex, bIndex, hoverIndex);
-        beginDrag = <span class="hljs-literal">false</span>;
-      } <span class="hljs-keyword">else</span> {
-        component.setState({hide: <span class="hljs-literal">true</span>});
-      }
-      <span class="hljs-keyword">return</span>;
-    }
-
     <span class="hljs-comment">// Time to actually perform the action</span>
     props.moveCard(dragBIndex, dragIndex, bIndex, hoverIndex);
-    <span class="hljs-built_in">console</span>.log(dragBIndex, dragIndex, bIndex, hoverIndex);
 
     <span class="hljs-comment">// Note: we're mutating the monitor item here!</span>
     <span class="hljs-comment">// Generally it's better to avoid mutations,</span>
@@ -364,6 +349,7 @@ Monokai Sublime style. Derived from Monokai by noformnocontent http://nn.mit-lic
   }
   render() {
     <span class="hljs-keyword">const</span> { isDragging, hide, isOver, text, connectDragSource, connectDropTarget } = <span class="hljs-keyword">this</span>.props;
+    <span class="hljs-comment">// console.log('card', isOver);</span>
     <span class="hljs-keyword">return</span> connectDragSource(connectDropTarget(
       <span class="xml"><span class="hljs-tag">&lt;<span class="hljs-title">div</span> <span class="hljs-attribute">className</span>=<span class="hljs-value">"card"</span> <span class="hljs-attribute">style</span>=<span class="hljs-value">{{</span>
         <span class="hljs-attribute">fontSize:</span> <span class="hljs-attribute">24</span>,

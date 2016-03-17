@@ -2,7 +2,7 @@
 <html>
 
 <head>
-  <title>dnd.js - example - react-dnd-demo@1.0.0</title>
+  <title>block.js - example - react-dnd-demo@1.0.0</title>
   <meta name="viewport"
         content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no">
   <meta charset="utf-8"/>
@@ -263,177 +263,72 @@ Monokai Sublime style. Derived from Monokai by noformnocontent http://nn.mit-lic
   </div>
   <div class="example" id="__react-content"></div>
   <script src="common.js?nowrap"></script>
-  <script src="dnd.js?nowrap"></script>
-  <div class="highlight"><pre><code language="undefined">import React, { Component } from 'react';
-import update from 'react/lib/update';
-import { DragDropContext } from 'react-dnd';
-import HTML5Backend from 'react-dnd-html5-backend';
+  <script src="block.js?nowrap"></script>
+  <div class="highlight"><pre><code language="js"><span class="hljs-keyword">import</span> React, { Component, PropTypes } <span class="hljs-keyword">from</span> <span class="hljs-string">'react'</span>;
+<span class="hljs-keyword">import</span> { DropTarget } <span class="hljs-keyword">from</span> <span class="hljs-string">'react-dnd'</span>;
 
-import blocks from './data';
-import Card from './card';
-import Block from './block';
-
-// import InfiniteScrollFn from 'react-infinite-scroll';
-// const InfiniteScroll = InfiniteScrollFn(React);
-import Infinite from 'react-infinite';
-
-function buildElements(start, end) {
-  var elements = [];
-  for (var i = start; i &lt; end; i++) {
-    elements.push(&lt;div key={i} className="infi-item"&gt;
-      List Item {i}
-    &lt;/div&gt;);
+<span class="hljs-keyword">const</span> boxTarget = {
+  drop(props, monitor, component) {
+    <span class="hljs-keyword">const</span> dragInfo = monitor.getItem();
+    <span class="hljs-keyword">if</span> (monitor.isOver({ shallow: <span class="hljs-literal">true</span> })) {
+      props.enterBlock(dragInfo.bIndex, dragInfo.index, props.index, <span class="hljs-string">'drop'</span>, monitor.getClientOffset());
+    }
+    <span class="hljs-comment">// component.setState({</span>
+    <span class="hljs-comment">//   hasDropped: true,</span>
+    <span class="hljs-comment">//   hasDroppedOnChild: hasDroppedOnChild</span>
+    <span class="hljs-comment">// });</span>
+  },
+  hover(props, monitor, component) {
+    <span class="hljs-keyword">const</span> dragInfo = monitor.getItem();
+    <span class="hljs-keyword">if</span> (dragInfo.bIndex === props.index) {
+      <span class="hljs-keyword">return</span>;
+    }
+    <span class="hljs-comment">// console.log('block', monitor.isOver({ shallow: true }));</span>
+    <span class="hljs-keyword">if</span> (monitor.isOver({ shallow: <span class="hljs-literal">true</span> })) {
+      props.enterBlock(dragInfo.bIndex, dragInfo.index, props.index, <span class="hljs-string">'hover'</span>, monitor.getClientOffset());
+    }
   }
-  return elements;
-}
+};
 
-let _id = 100;
-function makeId() {
-  _id++;
-  return _id;
-}
+<span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Block</span> <span class="hljs-keyword">extends</span> <span class="hljs-title">Component</span> </span>{
+  static propTypes = {
+    connectDropTarget: PropTypes.func.isRequired,
+    isOver: PropTypes.bool.isRequired,
+    isOverCurrent: PropTypes.bool.isRequired,
+    children: PropTypes.node
+  }
 
-let hoverCardIndex;
-let dropIndex;
-let cardRect;
-let enterB;
-let enterBIndex;
-let phIndex = [];
-
-class Dnd extends Component {
   constructor(props) {
-    super(props);
-    this.moveCard = this.moveCard.bind(this);
-    this.enterBlock = this.enterBlock.bind(this);
-    this.endDrag = this.endDrag.bind(this);
-    this.state = {
-      blocks,
-      isInfiniteLoading: false,
-      elements: buildElements(0, 20),
+    <span class="hljs-keyword">super</span>(props);
+    <span class="hljs-keyword">this</span>.state = {
+      hasDropped: <span class="hljs-literal">false</span>,
+      hasDroppedOnChild: <span class="hljs-literal">false</span>
     };
   }
 
-  handleInfiniteLoad() {
-    console.log('load');
-    this.setState({
-      isInfiniteLoading: true
-    });
-    setTimeout(() =&gt; {
-      var elemLength = this.state.elements.length,
-          newElements = buildElements(elemLength, elemLength + 30);
-      this.setState({
-        isInfiniteLoading: false,
-        elements: this.state.elements.concat(newElements)
-      });
-    }, 1000);
-  }
-
-  endDrag() {
-    const blocks = [...this.state.blocks];
-    if (phIndex[0] !== undefined) {
-      blocks[enterBIndex].cards.splice(phIndex[0], 1);
-      phIndex = [];
-      this.setState({blocks});
-    }
-    hoverCardIndex = undefined;
-    cardRect = undefined;
-    enterB = undefined;
-    enterBIndex = undefined;
-  }
-
-  moveCard(dragBIndex, dragIndex, bIndex, hoverIndex, cr) {
-    const blocks = [...this.state.blocks];
-    if (dragBIndex !== bIndex) {
-      enterB = false;
-      hoverCardIndex = hoverIndex;
-      console.log(phIndex);
-      // 删除原来的placeholder
-      if (phIndex[0] !== undefined) {
-        blocks[bIndex].cards.splice(phIndex[0], 1);
-        phIndex = [];
-        cardRect = cr;
-        this.setState({blocks});
-      }
-      return;
-    }
-
-    const removed = blocks[dragBIndex].cards.splice(dragIndex, 1);
-    blocks[bIndex].cards.splice(hoverIndex, 0, removed[0]);
-    this.setState({blocks});
-  }
-
-  enterBlock(dragBIndex, dragIndex, bIndex, flag, mouseOffset) {
-    if (dragBIndex === bIndex || enterB &amp;&amp; flag === 'hover') {
-      return;
-    }
-    enterB = true;
-    enterBIndex = bIndex;
-
-    const blocks = [...this.state.blocks];
-
-    if (hoverCardIndex === undefined) {
-      // 如果不经过任何一个card，则放到最后
-      dropIndex = this.state.blocks[bIndex].cards.length;
-    } else {
-      if (mouseOffset.y &lt; cardRect.top) {
-        dropIndex = hoverCardIndex;
-        if (dropIndex &lt; 0) {
-          dropIndex = 0;
-        }
-      }
-      if (mouseOffset.y &gt; cardRect.bottom) {
-        dropIndex = hoverCardIndex + 1;
-      }
-    }
-
-    if (flag === 'hover') {
-      if (phIndex[0] === undefined) {
-        blocks[bIndex].cards.splice(dropIndex, 0, {id: makeId(), text: '', placeholder: true});
-        phIndex[0] = dropIndex;
-        this.setState({blocks});
-      }
-    } else if (flag == 'drop') {
-      if (hoverCardIndex === undefined) {
-        dropIndex -= 1;
-        dropIndex = dropIndex &lt; 0 ? 0 : dropIndex;
-      }
-      const removed = blocks[dragBIndex].cards.splice(dragIndex, 1);
-      blocks[bIndex].cards[dropIndex] = removed[0];
-      phIndex = [];
-      this.setState({blocks});
-    }
-  }
-
   render() {
-    const { blocks } = this.state;
-    return (&lt;div className="dnd-container"&gt;
-      {blocks.map((block, index) =&gt; {
-        return (&lt;Block key={index} index={index} enterBlock={this.enterBlock}&gt;
-          &lt;Infinite elementHeight={40}
-            containerHeight={250}
-            infiniteLoadBeginEdgeOffset={200}
-            onInfiniteLoad={this.handleInfiniteLoad.bind(this)}
-            loadingSpinnerDelegate={&lt;div className="infi-item"&gt;Loading...&lt;/div&gt;}
-            isInfiniteLoading={this.state.isInfiniteLoading}&gt;
-            {this.state.elements}
-          &lt;/Infinite&gt;
-          {block.cards.map((card, i) =&gt; {
-            return card.placeholder ? &lt;div key={card.id} style={{height:'30px',backgroundColor:'#ccc'}}&gt;&lt;/div&gt; :
-              &lt;Card key={card.id}
-                bIndex={index}
-                index={i}
-                id={card.id}
-                text={card.text}
-                endDrag={this.endDrag}
-                moveCard={this.moveCard} /&gt;
-          })}
-        &lt;/Block&gt;);
-      })}
-    &lt;/div&gt;);
+    <span class="hljs-keyword">const</span> { isOver, isOverCurrent, connectDropTarget, children } = <span class="hljs-keyword">this</span>.props;
+    <span class="hljs-keyword">const</span> { hasDropped, hasDroppedOnChild } = <span class="hljs-keyword">this</span>.state;
+
+    <span class="hljs-keyword">return</span> connectDropTarget(
+      <span class="xml"><span class="hljs-tag">&lt;<span class="hljs-title">div</span> <span class="hljs-attribute">className</span>=<span class="hljs-value">"block"</span>&gt;</span>
+        <span class="hljs-tag">&lt;<span class="hljs-title">br</span>/&gt;</span>
+        {hasDropped &amp;&amp;
+          <span class="hljs-tag">&lt;<span class="hljs-title">span</span>&gt;</span>dropped {hasDroppedOnChild &amp;&amp; ' on child'}<span class="hljs-tag">&lt;/<span class="hljs-title">span</span>&gt;</span>
+        }
+        <span class="hljs-tag">&lt;<span class="hljs-title">div</span>&gt;</span>
+          {children}
+        <span class="hljs-tag">&lt;/<span class="hljs-title">div</span>&gt;</span>
+      <span class="hljs-tag">&lt;/<span class="hljs-title">div</span>&gt;</span>
+    )</span>;
   }
 }
 
-export default DragDropContext(HTML5Backend)(Dnd);
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">default</span> DropTarget(<span class="hljs-string">'dnd'</span>, boxTarget, (connect, monitor) =&gt; ({
+  connectDropTarget: connect.dropTarget(),
+  isOver: monitor.isOver(),
+  isOverCurrent: monitor.isOver({ shallow: <span class="hljs-literal">true</span> })
+}))(Block);
 </code></pre></div>
 </div>
 <a href="https://github.com/react-component/react-dnd-demo">

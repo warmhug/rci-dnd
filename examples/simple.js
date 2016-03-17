@@ -249,7 +249,11 @@ webpackJsonp([1],[
 	
 	var _card2 = _interopRequireDefault(_card);
 	
-	var _reactInfinite = __webpack_require__(323);
+	var _block = __webpack_require__(323);
+	
+	var _block2 = _interopRequireDefault(_block);
+	
+	var _reactInfinite = __webpack_require__(324);
 	
 	var _reactInfinite2 = _interopRequireDefault(_reactInfinite);
 	
@@ -280,6 +284,19 @@ webpackJsonp([1],[
 	  return elements;
 	}
 	
+	var _id = 100;
+	function makeId() {
+	  _id++;
+	  return _id;
+	}
+	
+	var hoverCardIndex = void 0;
+	var dropIndex = void 0;
+	var cardRect = void 0;
+	var enterB = void 0;
+	var enterBIndex = void 0;
+	var phIndex = [];
+	
 	var Dnd = function (_Component) {
 	  _inherits(Dnd, _Component);
 	
@@ -289,6 +306,8 @@ webpackJsonp([1],[
 	    var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(Dnd).call(this, props));
 	
 	    _this.moveCard = _this.moveCard.bind(_this);
+	    _this.enterBlock = _this.enterBlock.bind(_this);
+	    _this.endDrag = _this.endDrag.bind(_this);
 	    _this.state = {
 	      blocks: _data2.default,
 	      isInfiniteLoading: false,
@@ -316,13 +335,83 @@ webpackJsonp([1],[
 	      }, 1000);
 	    }
 	  }, {
-	    key: 'moveCard',
-	    value: function moveCard(dragBIndex, dragIndex, bIndex, hoverIndex) {
+	    key: 'endDrag',
+	    value: function endDrag() {
 	      var blocks = [].concat(_toConsumableArray(this.state.blocks));
+	      if (phIndex[0] !== undefined) {
+	        blocks[enterBIndex].cards.splice(phIndex[0], 1);
+	        phIndex = [];
+	        this.setState({ blocks: blocks });
+	      }
+	      hoverCardIndex = undefined;
+	      cardRect = undefined;
+	      enterB = undefined;
+	      enterBIndex = undefined;
+	    }
+	  }, {
+	    key: 'moveCard',
+	    value: function moveCard(dragBIndex, dragIndex, bIndex, hoverIndex, cr) {
+	      var blocks = [].concat(_toConsumableArray(this.state.blocks));
+	      if (dragBIndex !== bIndex) {
+	        enterB = false;
+	        hoverCardIndex = hoverIndex;
+	        console.log(phIndex);
+	        // 删除原来的placeholder
+	        if (phIndex[0] !== undefined) {
+	          blocks[bIndex].cards.splice(phIndex[0], 1);
+	          phIndex = [];
+	          cardRect = cr;
+	          this.setState({ blocks: blocks });
+	        }
+	        return;
+	      }
+	
 	      var removed = blocks[dragBIndex].cards.splice(dragIndex, 1);
 	      blocks[bIndex].cards.splice(hoverIndex, 0, removed[0]);
-	      console.log('xxxdd');
 	      this.setState({ blocks: blocks });
+	    }
+	  }, {
+	    key: 'enterBlock',
+	    value: function enterBlock(dragBIndex, dragIndex, bIndex, flag, mouseOffset) {
+	      if (dragBIndex === bIndex || enterB && flag === 'hover') {
+	        return;
+	      }
+	      enterB = true;
+	      enterBIndex = bIndex;
+	
+	      var blocks = [].concat(_toConsumableArray(this.state.blocks));
+	
+	      if (hoverCardIndex === undefined) {
+	        // 如果不经过任何一个card，则放到最后
+	        dropIndex = this.state.blocks[bIndex].cards.length;
+	      } else {
+	        if (mouseOffset.y < cardRect.top) {
+	          dropIndex = hoverCardIndex;
+	          if (dropIndex < 0) {
+	            dropIndex = 0;
+	          }
+	        }
+	        if (mouseOffset.y > cardRect.bottom) {
+	          dropIndex = hoverCardIndex + 1;
+	        }
+	      }
+	
+	      if (flag === 'hover') {
+	        if (phIndex[0] === undefined) {
+	          blocks[bIndex].cards.splice(dropIndex, 0, { id: makeId(), text: '', placeholder: true });
+	          phIndex[0] = dropIndex;
+	          this.setState({ blocks: blocks });
+	        }
+	      } else if (flag == 'drop') {
+	        if (hoverCardIndex === undefined) {
+	          dropIndex -= 1;
+	          dropIndex = dropIndex < 0 ? 0 : dropIndex;
+	        }
+	        var removed = blocks[dragBIndex].cards.splice(dragIndex, 1);
+	        blocks[bIndex].cards[dropIndex] = removed[0];
+	        phIndex = [];
+	        this.setState({ blocks: blocks });
+	      }
 	    }
 	  }, {
 	    key: 'render',
@@ -336,8 +425,8 @@ webpackJsonp([1],[
 	        { className: 'dnd-container' },
 	        blocks.map(function (block, index) {
 	          return _react2.default.createElement(
-	            'div',
-	            { key: index, className: 'block' },
+	            _block2.default,
+	            { key: index, index: index, enterBlock: _this3.enterBlock },
 	            _react2.default.createElement(
 	              _reactInfinite2.default,
 	              { elementHeight: 40,
@@ -353,11 +442,12 @@ webpackJsonp([1],[
 	              _this3.state.elements
 	            ),
 	            block.cards.map(function (card, i) {
-	              return _react2.default.createElement(_card2.default, { key: card.id,
+	              return card.placeholder ? _react2.default.createElement('div', { key: card.id, style: { height: '30px', backgroundColor: '#ccc' } }) : _react2.default.createElement(_card2.default, { key: card.id,
 	                bIndex: index,
 	                index: i,
 	                id: card.id,
 	                text: card.text,
+	                endDrag: _this3.endDrag,
 	                moveCard: _this3.moveCard });
 	            })
 	          );
@@ -8150,23 +8240,21 @@ webpackJsonp([1],[
 	
 	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 	
-	var _beginDrag = false;
-	
 	var dSource = {
 	  beginDrag: function beginDrag(props) {
-	    _beginDrag = true;
 	    return {
 	      id: props.id,
 	      index: props.index,
 	      bIndex: props.bIndex
 	    };
+	  },
+	  endDrag: function endDrag(props, monitor, component) {
+	    props.endDrag();
 	  }
 	};
 	
 	var dTarget = {
-	  drop: function drop(props, monitor, component) {
-	    console.log(component);
-	  },
+	  drop: function drop(props, monitor, component) {},
 	  hover: function hover(props, monitor, component) {
 	    var dragInfo = monitor.getItem();
 	    var dragIndex = dragInfo.index;
@@ -8180,14 +8268,19 @@ webpackJsonp([1],[
 	      return;
 	    }
 	
+	    // Determine mouse position
+	    var clientOffset = monitor.getClientOffset();
+	
 	    // Determine rectangle on screen
 	    var hoverBoundingRect = (0, _reactDom.findDOMNode)(component).getBoundingClientRect();
 	
+	    if (dragBIndex !== bIndex) {
+	      props.moveCard(dragBIndex, dragIndex, bIndex, hoverIndex, hoverBoundingRect);
+	      return;
+	    }
+	
 	    // Get vertical middle
 	    var hoverMiddleY = (hoverBoundingRect.bottom - hoverBoundingRect.top) / 2;
-	
-	    // Determine mouse position
-	    var clientOffset = monitor.getClientOffset();
 	
 	    // Get pixels to the top
 	    var hoverClientY = clientOffset.y - hoverBoundingRect.top;
@@ -8200,33 +8293,13 @@ webpackJsonp([1],[
 	    if (dragIndex < hoverIndex && hoverClientY < hoverMiddleY) {
 	      return;
 	    }
-	
 	    // Dragging upwards
 	    if (dragIndex > hoverIndex && hoverClientY > hoverMiddleY) {
 	      return;
 	    }
 	
-	    if (dragBIndex !== bIndex) {
-	      // console.log(component);
-	      // console.log('xxx');
-	      if (hoverClientY <= hoverMiddleY) {
-	        hoverIndex -= 1;
-	        hoverIndex = hoverIndex < 0 ? 0 : hoverIndex;
-	      } else {
-	        hoverIndex += 1;
-	      }
-	      if (_beginDrag) {
-	        props.moveCard(dragBIndex, dragIndex, bIndex, hoverIndex);
-	        _beginDrag = false;
-	      } else {
-	        component.setState({ hide: true });
-	      }
-	      return;
-	    }
-	
 	    // Time to actually perform the action
 	    props.moveCard(dragBIndex, dragIndex, bIndex, hoverIndex);
-	    console.log(dragBIndex, dragIndex, bIndex, hoverIndex);
 	
 	    // Note: we're mutating the monitor item here!
 	    // Generally it's better to avoid mutations,
@@ -8258,6 +8331,7 @@ webpackJsonp([1],[
 	      var text = _props.text;
 	      var connectDragSource = _props.connectDragSource;
 	      var connectDropTarget = _props.connectDropTarget;
+	      // console.log('card', isOver);
 	
 	      return connectDragSource(connectDropTarget(_react2.default.createElement(
 	        'div',
@@ -8847,6 +8921,120 @@ webpackJsonp([1],[
 /* 323 */
 /***/ function(module, exports, __webpack_require__) {
 
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+	
+	var _react = __webpack_require__(4);
+	
+	var _react2 = _interopRequireDefault(_react);
+	
+	var _reactDnd = __webpack_require__(166);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+	
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+	
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+	
+	var boxTarget = {
+	  drop: function drop(props, monitor, component) {
+	    var dragInfo = monitor.getItem();
+	    if (monitor.isOver({ shallow: true })) {
+	      props.enterBlock(dragInfo.bIndex, dragInfo.index, props.index, 'drop', monitor.getClientOffset());
+	    }
+	    // component.setState({
+	    //   hasDropped: true,
+	    //   hasDroppedOnChild: hasDroppedOnChild
+	    // });
+	  },
+	  hover: function hover(props, monitor, component) {
+	    var dragInfo = monitor.getItem();
+	    if (dragInfo.bIndex === props.index) {
+	      return;
+	    }
+	    // console.log('block', monitor.isOver({ shallow: true }));
+	    if (monitor.isOver({ shallow: true })) {
+	      props.enterBlock(dragInfo.bIndex, dragInfo.index, props.index, 'hover', monitor.getClientOffset());
+	    }
+	  }
+	};
+	
+	var Block = function (_Component) {
+	  _inherits(Block, _Component);
+	
+	  function Block(props) {
+	    _classCallCheck(this, Block);
+	
+	    var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(Block).call(this, props));
+	
+	    _this.state = {
+	      hasDropped: false,
+	      hasDroppedOnChild: false
+	    };
+	    return _this;
+	  }
+	
+	  _createClass(Block, [{
+	    key: 'render',
+	    value: function render() {
+	      var _props = this.props;
+	      var isOver = _props.isOver;
+	      var isOverCurrent = _props.isOverCurrent;
+	      var connectDropTarget = _props.connectDropTarget;
+	      var children = _props.children;
+	      var _state = this.state;
+	      var hasDropped = _state.hasDropped;
+	      var hasDroppedOnChild = _state.hasDroppedOnChild;
+	
+	
+	      return connectDropTarget(_react2.default.createElement(
+	        'div',
+	        { className: 'block' },
+	        _react2.default.createElement('br', null),
+	        hasDropped && _react2.default.createElement(
+	          'span',
+	          null,
+	          'dropped ',
+	          hasDroppedOnChild && ' on child'
+	        ),
+	        _react2.default.createElement(
+	          'div',
+	          null,
+	          children
+	        )
+	      ));
+	    }
+	  }]);
+	
+	  return Block;
+	}(_react.Component);
+	
+	Block.propTypes = {
+	  connectDropTarget: _react.PropTypes.func.isRequired,
+	  isOver: _react.PropTypes.bool.isRequired,
+	  isOverCurrent: _react.PropTypes.bool.isRequired,
+	  children: _react.PropTypes.node
+	};
+	exports.default = (0, _reactDnd.DropTarget)('dnd', boxTarget, function (connect, monitor) {
+	  return {
+	    connectDropTarget: connect.dropTarget(),
+	    isOver: monitor.isOver(),
+	    isOverCurrent: monitor.isOver({ shallow: true })
+	  };
+	})(Block);
+	module.exports = exports['default'];
+
+/***/ },
+/* 324 */
+/***/ function(module, exports, __webpack_require__) {
+
 	/* WEBPACK VAR INJECTION */(function(global) {'use strict';
 	
 	function _objectWithoutProperties(obj, keys) { var target = {}; for (var i in obj) { if (keys.indexOf(i) >= 0) continue; if (!Object.prototype.hasOwnProperty.call(obj, i)) continue; target[i] = obj[i]; } return target; }
@@ -8854,13 +9042,13 @@ webpackJsonp([1],[
 	var React = global.React || __webpack_require__(4);
 	var ReactDOM = global.ReactDOM || __webpack_require__(161);
 	
-	__webpack_require__(324);
-	var scaleEnum = __webpack_require__(327);
-	var infiniteHelpers = __webpack_require__(328);
-	var _isFinite = __webpack_require__(333);
+	__webpack_require__(325);
+	var scaleEnum = __webpack_require__(328);
+	var infiniteHelpers = __webpack_require__(329);
+	var _isFinite = __webpack_require__(334);
 	
-	var preloadType = __webpack_require__(334).preloadType;
-	var checkProps = checkProps = __webpack_require__(335);
+	var preloadType = __webpack_require__(335).preloadType;
+	var checkProps = checkProps = __webpack_require__(336);
 	
 	var Infinite = React.createClass({
 	  displayName: 'Infinite',
@@ -9298,7 +9486,7 @@ webpackJsonp([1],[
 	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
 
 /***/ },
-/* 324 */
+/* 325 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/*
@@ -9311,15 +9499,15 @@ webpackJsonp([1],[
 	'use strict';
 	
 	if (!Object.assign) {
-	  Object.assign = __webpack_require__(325);
+	  Object.assign = __webpack_require__(326);
 	}
 	
 	if (!Array.isArray) {
-	  Array.isArray = __webpack_require__(326);
+	  Array.isArray = __webpack_require__(327);
 	}
 
 /***/ },
-/* 325 */
+/* 326 */
 /***/ function(module, exports) {
 
 	/* eslint-disable no-unused-vars */
@@ -9364,7 +9552,7 @@ webpackJsonp([1],[
 
 
 /***/ },
-/* 326 */
+/* 327 */
 /***/ function(module, exports) {
 
 	/**
@@ -9550,7 +9738,7 @@ webpackJsonp([1],[
 
 
 /***/ },
-/* 327 */
+/* 328 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -9560,13 +9748,13 @@ webpackJsonp([1],[
 	};
 
 /***/ },
-/* 328 */
+/* 329 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(global) {'use strict';
 	
-	var ConstantInfiniteComputer = __webpack_require__(329);
-	var ArrayInfiniteComputer = __webpack_require__(331);
+	var ConstantInfiniteComputer = __webpack_require__(330);
+	var ArrayInfiniteComputer = __webpack_require__(332);
 	var React = global.React || __webpack_require__(4);
 	
 	function createInfiniteComputer(data, children) {
@@ -9612,7 +9800,7 @@ webpackJsonp([1],[
 	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
 
 /***/ },
-/* 329 */
+/* 330 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -9625,7 +9813,7 @@ webpackJsonp([1],[
 	
 	function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 	
-	var InfiniteComputer = __webpack_require__(330);
+	var InfiniteComputer = __webpack_require__(331);
 	
 	var ConstantInfiniteComputer = (function (_InfiniteComputer) {
 	  _inherits(ConstantInfiniteComputer, _InfiniteComputer);
@@ -9674,7 +9862,7 @@ webpackJsonp([1],[
 	module.exports = ConstantInfiniteComputer;
 
 /***/ },
-/* 330 */
+/* 331 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(process) {// An infinite computer must be able to do the following things:
@@ -9754,7 +9942,7 @@ webpackJsonp([1],[
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(7)))
 
 /***/ },
-/* 331 */
+/* 332 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -9767,8 +9955,8 @@ webpackJsonp([1],[
 	
 	function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 	
-	var InfiniteComputer = __webpack_require__(330),
-	    bs = __webpack_require__(332);
+	var InfiniteComputer = __webpack_require__(331),
+	    bs = __webpack_require__(333);
 	
 	var ArrayInfiniteComputer = (function (_InfiniteComputer) {
 	  _inherits(ArrayInfiniteComputer, _InfiniteComputer);
@@ -9836,7 +10024,7 @@ webpackJsonp([1],[
 	module.exports = ArrayInfiniteComputer;
 
 /***/ },
-/* 332 */
+/* 333 */
 /***/ function(module, exports) {
 
 	"use strict";
@@ -9884,7 +10072,7 @@ webpackJsonp([1],[
 	};
 
 /***/ },
-/* 333 */
+/* 334 */
 /***/ function(module, exports) {
 
 	/* WEBPACK VAR INJECTION */(function(global) {/**
@@ -9935,7 +10123,7 @@ webpackJsonp([1],[
 	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
 
 /***/ },
-/* 334 */
+/* 335 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(global) {'use strict';
@@ -9951,7 +10139,7 @@ webpackJsonp([1],[
 	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
 
 /***/ },
-/* 335 */
+/* 336 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(global) {// This module provides a centralized place for
@@ -9961,7 +10149,7 @@ webpackJsonp([1],[
 	'use strict';
 	
 	var React = global.React || __webpack_require__(4);
-	var _isFinite = __webpack_require__(333);
+	var _isFinite = __webpack_require__(334);
 	
 	module.exports = function (props) {
 	  var rie = 'Invariant Violation: ';
