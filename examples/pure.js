@@ -2,6 +2,7 @@
 
 // import 'rc-dnd/assets/index.less';
 // import Dnd from 'rc-dnd';
+import './demo.less';
 import './pure.less';
 import React, { Component } from 'react';
 import ReactDOM from 'react-dom';
@@ -70,4 +71,9 @@ var List = React.createClass({
   }
 });
 
-ReactDOM.render(<List data={colors} />, document.getElementById('__react-content'));
+ReactDOM.render(<div>
+  <p>Github：
+  <a href="https://github.com/warmhug/react-dnd-demo">https://github.com/warmhug/react-dnd-demo</a>
+  </p>
+  <List data={colors} />
+</div>, document.getElementById('__react-content'));
