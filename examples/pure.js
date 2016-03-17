@@ -98,7 +98,21 @@ webpackJsonp([0],[
 	  }
 	});
 	
-	_reactDom2.default.render(_react2.default.createElement(List, { data: colors }), document.getElementById('__react-content'));
+	_reactDom2.default.render(_react2.default.createElement(
+	  'div',
+	  null,
+	  _react2.default.createElement(
+	    'p',
+	    null,
+	    'Github：',
+	    _react2.default.createElement(
+	      'a',
+	      { href: 'https://github.com/warmhug/react-dnd-demo' },
+	      'https://github.com/warmhug/react-dnd-demo'
+	    )
+	  ),
+	  _react2.default.createElement(List, { data: colors })
+	), document.getElementById('__react-content'));
 
 /***/ },
 /* 2 */,

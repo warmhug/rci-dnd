@@ -172,8 +172,6 @@ webpackJsonp([1],[
 
 	'use strict';
 	
-	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-	
 	__webpack_require__(2);
 	
 	__webpack_require__(163);
@@ -192,36 +190,24 @@ webpackJsonp([1],[
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-	
-	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-	
-	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; } // use jsx to render html, do not modify simple.html
+	_reactDom2.default.render(_react2.default.createElement(
+	  'div',
+	  null,
+	  _react2.default.createElement(
+	    'p',
+	    null,
+	    'Github：',
+	    _react2.default.createElement(
+	      'a',
+	      { href: 'https://github.com/warmhug/react-dnd-demo' },
+	      'https://github.com/warmhug/react-dnd-demo'
+	    )
+	  ),
+	  _react2.default.createElement(_dnd2.default, null)
+	), document.getElementById('__react-content')); // use jsx to render html, do not modify simple.html
 	
 	// import 'rc-dnd/assets/index.less';
 	// import Dnd from 'rc-dnd';
-	
-	
-	var Demo = function (_Component) {
-	  _inherits(Demo, _Component);
-	
-	  function Demo() {
-	    _classCallCheck(this, Demo);
-	
-	    return _possibleConstructorReturn(this, Object.getPrototypeOf(Demo).apply(this, arguments));
-	  }
-	
-	  _createClass(Demo, [{
-	    key: 'render',
-	    value: function render() {
-	      return _react2.default.createElement(_dnd2.default, null);
-	    }
-	  }]);
-	
-	  return Demo;
-	}(_react.Component);
-	
-	_reactDom2.default.render(_react2.default.createElement(Demo, null), document.getElementById('__react-content'));
 
 /***/ },
 /* 163 */
