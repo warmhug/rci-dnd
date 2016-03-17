@@ -13,21 +13,25 @@ webpackJsonp([0],[
 	
 	__webpack_require__(2);
 	
-	var _react = __webpack_require__(3);
+	__webpack_require__(3);
+	
+	var _react = __webpack_require__(4);
 	
 	var _react2 = _interopRequireDefault(_react);
 	
-	var _reactDom = __webpack_require__(160);
+	var _reactDom = __webpack_require__(161);
 	
 	var _reactDom2 = _interopRequireDefault(_reactDom);
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
-	var colors = ["Red", "Green", "Blue", "Yellow", "Black", "White", "Orange"]; // use jsx to render html, do not modify simple.html
+	// use jsx to render html, do not modify simple.html
 	
 	// import 'rc-dnd/assets/index.less';
 	// import Dnd from 'rc-dnd';
 	
+	
+	var colors = ["Red", "Green", "Blue", "Yellow", "Black", "White", "Orange"];
 	var placeholder = document.createElement("li");
 	placeholder.className = "placeholder";
 	
@@ -97,7 +101,8 @@ webpackJsonp([0],[
 	_reactDom2.default.render(_react2.default.createElement(List, { data: colors }), document.getElementById('__react-content'));
 
 /***/ },
-/* 2 */
+/* 2 */,
+/* 3 */
 /***/ function(module, exports) {
 
 	// removed by extract-text-webpack-plugin

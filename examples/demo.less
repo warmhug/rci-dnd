@@ -1,0 +1,14 @@
+body {
+  > a {
+    display: none;
+  }
+  > .container {
+    > .header {
+      p {
+        &::after {
+          content: 'https://github.com/warmhug/react-dnd-demo'
+        }
+      }
+    }
+  }
+}

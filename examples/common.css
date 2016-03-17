@@ -1,0 +1,8 @@
+body > a {
+  display: none;
+}
+body > .container > .header p::after {
+  content: 'https://github.com/warmhug/react-dnd-demo';
+}
+
+/*# sourceMappingURL=common.css.map*/
