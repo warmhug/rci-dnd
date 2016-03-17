@@ -3,22 +3,22 @@ import { findDOMNode } from 'react-dom';
 import { DragSource, DropTarget } from 'react-dnd';
 import flow from 'lodash/flow';
 
-let beginDrag = false;
 
 const dSource = {
   beginDrag(props) {
-    beginDrag = true;
     return {
       id: props.id,
       index: props.index,
       bIndex: props.bIndex
     };
+  },
+  endDrag(props, monitor, component) {
+    props.endDrag();
   }
 };
 
 const dTarget = {
   drop(props, monitor, component) {
-    console.log(component);
   },
   hover(props, monitor, component) {
     const dragInfo = monitor.getItem();
@@ -33,14 +33,19 @@ const dTarget = {
       return;
     }
 
+    // Determine mouse position
+    const clientOffset = monitor.getClientOffset();
+
     // Determine rectangle on screen
     const hoverBoundingRect = findDOMNode(component).getBoundingClientRect();
 
+    if (dragBIndex !== bIndex) {
+      props.moveCard(dragBIndex, dragIndex, bIndex, hoverIndex, hoverBoundingRect);
+      return;
+    }
+
     // Get vertical middle
     const hoverMiddleY = (hoverBoundingRect.bottom - hoverBoundingRect.top) / 2;
-
-    // Determine mouse position
-    const clientOffset = monitor.getClientOffset();
 
     // Get pixels to the top
     const hoverClientY = clientOffset.y - hoverBoundingRect.top;
@@ -53,33 +58,13 @@ const dTarget = {
     if (dragIndex < hoverIndex && hoverClientY < hoverMiddleY) {
       return;
     }
-
     // Dragging upwards
     if (dragIndex > hoverIndex && hoverClientY > hoverMiddleY) {
       return;
     }
 
-    if (dragBIndex !== bIndex) {
-      // console.log(component);
-      // console.log('xxx');
-      if (hoverClientY <= hoverMiddleY) {
-        hoverIndex -= 1;
-        hoverIndex = hoverIndex < 0 ? 0 : hoverIndex;
-      } else {
-        hoverIndex += 1;
-      }
-      if (beginDrag) {
-        props.moveCard(dragBIndex, dragIndex, bIndex, hoverIndex);
-        beginDrag = false;
-      } else {
-        component.setState({hide: true});
-      }
-      return;
-    }
-
     // Time to actually perform the action
     props.moveCard(dragBIndex, dragIndex, bIndex, hoverIndex);
-    console.log(dragBIndex, dragIndex, bIndex, hoverIndex);
 
     // Note: we're mutating the monitor item here!
     // Generally it's better to avoid mutations,
@@ -98,6 +83,7 @@ class Card extends Component {
   }
   render() {
     const { isDragging, hide, isOver, text, connectDragSource, connectDropTarget } = this.props;
+    // console.log('card', isOver);
     return connectDragSource(connectDropTarget(
       <div className="card" style={{
         fontSize: 24,
