@@ -46,13 +46,7 @@ class Block extends Component {
 
     return connectDropTarget(
       <div className="block">
-        <br/>
-        {hasDropped &&
-          <span>dropped {hasDroppedOnChild && ' on child'}</span>
-        }
-        <div>
-          {children}
-        </div>
+        {children}
       </div>
     );
   }
