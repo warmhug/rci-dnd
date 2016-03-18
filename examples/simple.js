@@ -344,6 +344,7 @@ webpackJsonp([1],[
 	        this.setState({ blocks: blocks });
 	      }
 	      hoverCardIndex = undefined;
+	      dropIndex = undefined;
 	      cardRect = undefined;
 	      enterB = undefined;
 	      enterBIndex = undefined;
@@ -355,12 +356,13 @@ webpackJsonp([1],[
 	      if (dragBIndex !== bIndex) {
 	        enterB = false;
 	        hoverCardIndex = hoverIndex;
-	        console.log(phIndex);
+	        if (!cardRect) {
+	          cardRect = cr;
+	        }
 	        // 删除原来的placeholder
 	        if (phIndex[0] !== undefined) {
 	          blocks[bIndex].cards.splice(phIndex[0], 1);
 	          phIndex = [];
-	          cardRect = cr;
 	          this.setState({ blocks: blocks });
 	        }
 	        return;
