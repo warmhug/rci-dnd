@@ -8997,18 +8997,7 @@ webpackJsonp([1],[
 	      return connectDropTarget(_react2.default.createElement(
 	        'div',
 	        { className: 'block' },
-	        _react2.default.createElement('br', null),
-	        hasDropped && _react2.default.createElement(
-	          'span',
-	          null,
-	          'dropped ',
-	          hasDroppedOnChild && ' on child'
-	        ),
-	        _react2.default.createElement(
-	          'div',
-	          null,
-	          children
-	        )
+	        children
 	      ));
 	    }
 	  }]);
