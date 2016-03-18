@@ -70,6 +70,7 @@ class Dnd extends Component {
       this.setState({blocks});
     }
     hoverCardIndex = undefined;
+    dropIndex = undefined;
     cardRect = undefined;
     enterB = undefined;
     enterBIndex = undefined;
@@ -80,12 +81,13 @@ class Dnd extends Component {
     if (dragBIndex !== bIndex) {
       enterB = false;
       hoverCardIndex = hoverIndex;
-      console.log(phIndex);
+      if (!cardRect) {
+        cardRect = cr;
+      }
       // 删除原来的placeholder
       if (phIndex[0] !== undefined) {
         blocks[bIndex].cards.splice(phIndex[0], 1);
         phIndex = [];
-        cardRect = cr;
         this.setState({blocks});
       }
       return;
