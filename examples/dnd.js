@@ -47,8 +47,8 @@ class Dnd extends Component {
     };
   }
 
-  handleInfiniteLoad() {
-    console.log('load');
+  handleInfiniteLoad(bIndex) {
+    console.log('load', arguments);
     this.setState({
       isInfiniteLoading: true
     });
@@ -118,7 +118,7 @@ class Dnd extends Component {
         }
       }
       if (mouseOffset.y > cardRect.bottom) {
-        dropIndex = hoverCardIndex + 1;
+        dropIndex = hoverCardIndex;
       }
     }
 
@@ -148,7 +148,7 @@ class Dnd extends Component {
           <Infinite elementHeight={40}
             containerHeight={250}
             infiniteLoadBeginEdgeOffset={200}
-            onInfiniteLoad={this.handleInfiniteLoad.bind(this)}
+            onInfiniteLoad={this.handleInfiniteLoad.bind(this, index)}
             loadingSpinnerDelegate={<div className="infi-item">Loading...</div>}
             isInfiniteLoading={this.state.isInfiniteLoading}>
             {this.state.elements}
