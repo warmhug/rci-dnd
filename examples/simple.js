@@ -318,10 +318,10 @@ webpackJsonp([1],[
 	
 	  _createClass(Dnd, [{
 	    key: 'handleInfiniteLoad',
-	    value: function handleInfiniteLoad() {
+	    value: function handleInfiniteLoad(bIndex) {
 	      var _this2 = this;
 	
-	      console.log('load');
+	      console.log('load', arguments);
 	      this.setState({
 	        isInfiniteLoading: true
 	      });
@@ -394,7 +394,7 @@ webpackJsonp([1],[
 	          }
 	        }
 	        if (mouseOffset.y > cardRect.bottom) {
-	          dropIndex = hoverCardIndex + 1;
+	          dropIndex = hoverCardIndex;
 	        }
 	      }
 	
@@ -434,7 +434,7 @@ webpackJsonp([1],[
 	              { elementHeight: 40,
 	                containerHeight: 250,
 	                infiniteLoadBeginEdgeOffset: 200,
-	                onInfiniteLoad: _this3.handleInfiniteLoad.bind(_this3),
+	                onInfiniteLoad: _this3.handleInfiniteLoad.bind(_this3, index),
 	                loadingSpinnerDelegate: _react2.default.createElement(
 	                  'div',
 	                  { className: 'infi-item' },
