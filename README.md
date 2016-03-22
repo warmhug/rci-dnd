@@ -6,7 +6,7 @@ React-dnd
 
 ## Screenshots
 
-<img src="https://t.alipayobjects.com/images/T15BpfXn8nXXXXXXXX.png" width="288"/>
+<img src="https://os.alipayobjects.com/rmsportal/BeMjJFaDkJJOsTJ.png" width="288"/>
 
 ## Usage
 > see examples
