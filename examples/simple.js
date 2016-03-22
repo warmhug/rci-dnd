@@ -210,6 +210,9 @@ webpackJsonp([1],[
 	// const InfiniteScroll = InfiniteScrollFn(React);
 	
 	
+	var Block = _rciDnd2["default"].Block;
+	var Card = _rciDnd2["default"].Card;
+	
 	function buildElements(start, end) {
 	  var elements = [];
 	  for (var i = start; i < end; i++) {
@@ -232,6 +235,7 @@ webpackJsonp([1],[
 	    var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(Demo).call(this, props));
 	
 	    _this.state = {
+	      data: _data2["default"],
 	      isInfiniteLoading: false,
 	      elements: buildElements(0, 20)
 	    };
@@ -258,7 +262,9 @@ webpackJsonp([1],[
 	    }
 	  }, {
 	    key: 'onEndDrag',
-	    value: function onEndDrag(data) {}
+	    value: function onEndDrag(data) {
+	      this.setState({ data: data });
+	    }
 	  }, {
 	    key: 'render',
 	    value: function render() {
@@ -280,7 +286,31 @@ webpackJsonp([1],[
 	      return _react2["default"].createElement(
 	        'div',
 	        null,
-	        _react2["default"].createElement(_rciDnd2["default"], { data: _data2["default"], onEndDrag: this.onEndDrag })
+	        _react2["default"].createElement(
+	          _rciDnd2["default"],
+	          { data: this.state.data,
+	            onEndDrag: this.onEndDrag.bind(this),
+	            onDrop: this.onEndDrag.bind(this),
+	            onMoveCard: this.onEndDrag.bind(this),
+	            onEnterBlock: this.onEndDrag.bind(this)
+	          },
+	          _data2["default"].map(function (block, index) {
+	            return _react2["default"].createElement(
+	              Block,
+	              { key: index },
+	              _react2["default"].createElement(
+	                'div',
+	                null,
+	                block.cards.map(function (card, i) {
+	                  return _react2["default"].createElement(Card, { key: card.id,
+	                    placeholder: card._placeholder,
+	                    bIndex: index,
+	                    content: card.content });
+	                })
+	              )
+	            );
+	          })
+	        )
 	      );
 	    }
 	  }]);
@@ -344,10 +374,20 @@ webpackJsonp([1],[
 	
 	var _dnd2 = _interopRequireDefault(_dnd);
 	
+	var _card = __webpack_require__(308);
+	
+	var _card2 = _interopRequireDefault(_card);
+	
+	var _block = __webpack_require__(324);
+	
+	var _block2 = _interopRequireDefault(_block);
+	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 	
-	exports["default"] = _dnd2["default"]; // export this package's api
+	_dnd2["default"].Block = _block2["default"]; // export this package's api
 	
+	_dnd2["default"].Card = _card2["default"];
+	exports["default"] = _dnd2["default"];
 	module.exports = exports['default'];
 
 /***/ },
@@ -434,7 +474,7 @@ webpackJsonp([1],[
 	    value: function onEndDrag() {
 	      var blocks = [].concat(_toConsumableArray(this.props.data));
 	      this.resetPhIndex(blocks);
-	      this.setState({ blocks: blocks });
+	      // this.setState({blocks});
 	      hoverCardIndex = undefined;
 	      dropIndex = undefined;
 	      cardRect = undefined;
@@ -453,13 +493,15 @@ webpackJsonp([1],[
 	        }
 	
 	        this.resetPhIndex(blocks);
-	        this.setState({ blocks: blocks });
+	        // this.setState({blocks});
+	        this.props.onMoveCard(blocks);
 	        return;
 	      }
 	
 	      var removed = blocks[dragBIndex].cards.splice(dragIndex, 1);
 	      blocks[bIndex].cards.splice(hoverIndex, 0, removed[0]);
-	      this.setState({ blocks: blocks });
+	      // this.setState({blocks});
+	      this.props.onMoveCard(blocks);
 	    }
 	  }, {
 	    key: 'onEnterBlock',
@@ -486,7 +528,8 @@ webpackJsonp([1],[
 	      if (flag === 'hover') {
 	        blocks[bIndex].cards.splice(dropIndex, 0, { id: makeId(), content: '', _placeholder: true });
 	        phIndex[0] = [bIndex, dropIndex];
-	        this.setState({ blocks: blocks });
+	        // this.setState({blocks});
+	        this.props.onEnterBlock(blocks);
 	      } else if (flag == 'drop') {
 	        if (!cardRect) {
 	          dropIndex -= 1;
@@ -495,43 +538,53 @@ webpackJsonp([1],[
 	        var removed = blocks[dragBIndex].cards.splice(dragIndex, 1);
 	        blocks[bIndex].cards[dropIndex] = removed[0];
 	        phIndex = [];
-	        this.setState({ blocks: blocks });
+	        // this.setState({blocks});
+	        this.props.onDrop(blocks);
 	      }
+	    }
+	  }, {
+	    key: 'recursiveCloneChildren',
+	    value: function recursiveCloneChildren(children) {
+	      var _this2 = this;
+	
+	      var props = this.props;
+	      return _react2["default"].Children.map(children, function (child, index) {
+	        var childProps = {};
+	        if (_react2["default"].isValidElement(child)) {
+	          if (child.type == _block2["default"]) {
+	            childProps = {
+	              prefixCls: props.prefixCls,
+	              index: index,
+	              onEnterBlock: _this2.onEnterBlock
+	            };
+	          }
+	          if (child.type == _card2["default"]) {
+	            childProps = {
+	              prefixCls: props.prefixCls,
+	              index: index,
+	              onEndDrag: _this2.onEndDrag,
+	              onMoveCard: _this2.onMoveCard
+	            };
+	          }
+	        }
+	        childProps.children = _this2.recursiveCloneChildren(child.props.children);
+	        return _react2["default"].cloneElement(child, childProps);
+	      });
 	    }
 	  }, {
 	    key: 'render',
 	    value: function render() {
-	      var _this2 = this;
-	
 	      var _props = this.props;
 	      var className = _props.className;
 	      var prefixCls = _props.prefixCls;
-	      var placeholderCls = _props.placeholderCls;
 	      var data = _props.data;
+	      var children = _props.children;
 	
+	      var newChildren = this.recursiveCloneChildren(children);
 	      return _react2["default"].createElement(
 	        'div',
 	        { className: (0, _classnames2["default"])(className, prefixCls) },
-	        data.map(function (block, index) {
-	          return _react2["default"].createElement(
-	            _block2["default"],
-	            { prefixCls: prefixCls,
-	              key: index,
-	              index: index,
-	              onEnterBlock: _this2.onEnterBlock
-	            },
-	            block.cards.map(function (card, i) {
-	              return card._placeholder ? _react2["default"].createElement('div', { key: card.id,
-	                className: (0, _classnames2["default"])(placeholderCls, prefixCls + '-placeholder') }) : _react2["default"].createElement(_card2["default"], { prefixCls: prefixCls,
-	                key: card.id,
-	                index: i,
-	                bIndex: index,
-	                content: card.content,
-	                onEndDrag: _this2.onEndDrag,
-	                onMoveCard: _this2.onMoveCard });
-	            })
-	          );
-	        })
+	        newChildren
 	      );
 	    }
 	  }]);
@@ -540,14 +593,13 @@ webpackJsonp([1],[
 	}(_react.Component);
 	
 	Dnd.propTypes = {
+	  children: _react.PropTypes.any,
 	  prefixCls: _react.PropTypes.string,
-	  placeholderCls: _react.PropTypes.string,
 	  data: _react.PropTypes.array,
 	  onEndDrag: _react.PropTypes.func
 	};
 	Dnd.defaultProps = {
 	  prefixCls: 'rci-dnd',
-	  placeholderCls: '',
 	  onEndDrag: function onEndDrag() {}
 	};
 	
@@ -8328,14 +8380,16 @@ webpackJsonp([1],[
 	
 	      var _props = this.props;
 	      var prefixCls = _props.prefixCls;
+	      var placeholder = _props.placeholder;
 	      var isDragging = _props.isDragging;
 	      var isOver = _props.isOver;
 	      var content = _props.content;
 	      var connectDragSource = _props.connectDragSource;
 	      var connectDropTarget = _props.connectDropTarget;
 	
-	      var cls = (_cls = {}, _defineProperty(_cls, prefixCls + '-card', true), _defineProperty(_cls, prefixCls + '-card-dragging', isDragging), _defineProperty(_cls, prefixCls + '-card-over', isOver), _cls);
-	      return connectDragSource(connectDropTarget(_react2["default"].createElement(
+	      var cls = (_cls = {}, _defineProperty(_cls, prefixCls + '-card', true), _defineProperty(_cls, prefixCls + '-card-placeholder', placeholder), _defineProperty(_cls, prefixCls + '-card-dragging', isDragging), _defineProperty(_cls, prefixCls + '-card-over', isOver), _cls);
+	      // console.log(this.props);
+	      return placeholder ? _react2["default"].createElement('div', { className: (0, _classnames2["default"])(cls) }) : connectDragSource(connectDropTarget(_react2["default"].createElement(
 	        'div',
 	        { className: (0, _classnames2["default"])(cls) },
 	        content
@@ -8980,6 +9034,7 @@ webpackJsonp([1],[
 	      var children = _props.children;
 	      var prefixCls = _props.prefixCls;
 	      // const { hasDropped } = this.state;
+	      // console.log(this.props, 'ddd');
 	
 	      return connectDropTarget(_react2["default"].createElement(
 	        'div',

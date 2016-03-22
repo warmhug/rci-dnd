@@ -2,7 +2,7 @@
 <html>
 
 <head>
-  <title>simple.js - example - rci-dnd@0.1.0</title>
+  <title>simple.js - example - rci-dnd@0.2.0</title>
   <meta name="viewport"
         content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no">
   <meta charset="utf-8"/>
@@ -258,85 +258,107 @@ Monokai Sublime style. Derived from Monokai by noformnocontent http://nn.mit-lic
 <body>
   <div class="container">
     <div class="header">
-      <h1>rci-dnd@0.1.0</h1>
+      <h1>rci-dnd@0.2.0</h1>
 
       <p>dnd ui component for react</p>
     </div>
     <div class="example" id="__react-content"></div>
 
-    <div class="highlight"><pre><code language="js"><span class="hljs-comment">// use jsx to render html, do not modify simple.html</span>
+    <div class="highlight"><pre><code language="undefined">// use jsx to render html, do not modify simple.html
 
-<span class="hljs-keyword">import</span> React, { Component } <span class="hljs-keyword">from</span> <span class="hljs-string">'react'</span>;
-<span class="hljs-keyword">import</span> ReactDOM <span class="hljs-keyword">from</span> <span class="hljs-string">'react-dom'</span>;
+import React, { Component } from 'react';
+import ReactDOM from 'react-dom';
 
-<span class="hljs-keyword">import</span> <span class="hljs-string">'rci-dnd/assets/index.css'</span>;
-<span class="hljs-keyword">import</span> <span class="hljs-string">'./demo.less'</span>;
-<span class="hljs-keyword">import</span> Dnd <span class="hljs-keyword">from</span> <span class="hljs-string">'rci-dnd'</span>;
-<span class="hljs-keyword">import</span> blocks <span class="hljs-keyword">from</span> <span class="hljs-string">'./data'</span>;
+import 'rci-dnd/assets/index.css';
+import './demo.less';
+import Dnd from 'rci-dnd';
+import data from './data';
 
-<span class="hljs-comment">// import InfiniteScrollFn from 'react-infinite-scroll';</span>
-<span class="hljs-comment">// const InfiniteScroll = InfiniteScrollFn(React);</span>
-<span class="hljs-keyword">import</span> Infinite <span class="hljs-keyword">from</span> <span class="hljs-string">'react-infinite'</span>;
+// import InfiniteScrollFn from 'react-infinite-scroll';
+// const InfiniteScroll = InfiniteScrollFn(React);
+import Infinite from 'react-infinite';
 
-<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">buildElements</span>(<span class="hljs-params">start, end</span>) </span>{
-  <span class="hljs-keyword">var</span> elements = [];
-  <span class="hljs-keyword">for</span> (<span class="hljs-keyword">var</span> i = start; i &lt; end; i++) {
-    elements.push(<span class="xml"><span class="hljs-tag">&lt;<span class="hljs-title">div</span> <span class="hljs-attribute">key</span>=<span class="hljs-value">{i}</span> <span class="hljs-attribute">className</span>=<span class="hljs-value">"infi-item"</span>&gt;</span>
+const Block = Dnd.Block;
+const Card = Dnd.Card;
+
+function buildElements(start, end) {
+  var elements = [];
+  for (var i = start; i &lt; end; i++) {
+    elements.push(&lt;div key={i} className="infi-item"&gt;
       List Item {i}
-    <span class="hljs-tag">&lt;/<span class="hljs-title">div</span>&gt;</span>)</span>;
+    &lt;/div&gt;);
   }
-  <span class="hljs-keyword">return</span> elements;
+  return elements;
 }
 
-<span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Demo</span> <span class="hljs-keyword">extends</span> <span class="hljs-title">Component</span> </span>{
+class Demo extends Component {
   constructor(props) {
-    <span class="hljs-keyword">super</span>(props);
-    <span class="hljs-keyword">this</span>.state = {
-      isInfiniteLoading: <span class="hljs-literal">false</span>,
-      elements: buildElements(<span class="hljs-number">0</span>, <span class="hljs-number">20</span>),
+    super(props);
+    this.state = {
+      data,
+      isInfiniteLoading: false,
+      elements: buildElements(0, 20),
     };
   }
   handleInfiniteLoad(bIndex) {
-    <span class="hljs-built_in">console</span>.log(<span class="hljs-string">'load'</span>, <span class="hljs-built_in">arguments</span>);
-    <span class="hljs-keyword">this</span>.setState({
-      isInfiniteLoading: <span class="hljs-literal">true</span>
+    console.log('load', arguments);
+    this.setState({
+      isInfiniteLoading: true
     });
     setTimeout(() =&gt; {
-      <span class="hljs-keyword">var</span> elemLength = <span class="hljs-keyword">this</span>.state.elements.length,
-          newElements = buildElements(elemLength, elemLength + <span class="hljs-number">30</span>);
-      <span class="hljs-keyword">this</span>.setState({
-        isInfiniteLoading: <span class="hljs-literal">false</span>,
-        elements: <span class="hljs-keyword">this</span>.state.elements.concat(newElements)
+      var elemLength = this.state.elements.length,
+          newElements = buildElements(elemLength, elemLength + 30);
+      this.setState({
+        isInfiniteLoading: false,
+        elements: this.state.elements.concat(newElements)
       });
-    }, <span class="hljs-number">1000</span>);
+    }, 1000);
   }
   onEndDrag(data) {
-
+    this.setState({data});
   }
   render() {
-    <span class="hljs-keyword">const</span> infi = <span class="xml"><span class="hljs-tag">&lt;<span class="hljs-title">Infinite</span> <span class="hljs-attribute">elementHeight</span>=<span class="hljs-value">{40}</span>
-      <span class="hljs-attribute">containerHeight</span>=<span class="hljs-value">{250}</span>
-      <span class="hljs-attribute">infiniteLoadBeginEdgeOffset</span>=<span class="hljs-value">{200}</span>
-      <span class="hljs-attribute">onInfiniteLoad</span>=<span class="hljs-value">{this.handleInfiniteLoad.bind(this)}</span>
-      <span class="hljs-attribute">loadingSpinnerDelegate</span>=<span class="hljs-value">{&lt;div</span> <span class="hljs-attribute">className</span>=<span class="hljs-value">"infi-item"</span>&gt;</span>Loading...<span class="hljs-tag">&lt;/<span class="hljs-title">div</span>&gt;</span>}
+    const infi = &lt;Infinite elementHeight={40}
+      containerHeight={250}
+      infiniteLoadBeginEdgeOffset={200}
+      onInfiniteLoad={this.handleInfiniteLoad.bind(this)}
+      loadingSpinnerDelegate={&lt;div className="infi-item"&gt;Loading...&lt;/div&gt;}
       isInfiniteLoading={this.state.isInfiniteLoading}&gt;
       {this.state.elements}
-    <span class="hljs-tag">&lt;/<span class="hljs-title">Infinite</span>&gt;</span>;</span>
+    &lt;/Infinite&gt;;
 
-    <span class="hljs-keyword">return</span> (<span class="xml"><span class="hljs-tag">&lt;<span class="hljs-title">div</span>&gt;</span>
-      <span class="hljs-tag">&lt;<span class="hljs-title">Dnd</span> <span class="hljs-attribute">data</span>=<span class="hljs-value">{blocks}</span> <span class="hljs-attribute">onEndDrag</span>=<span class="hljs-value">{this.onEndDrag}</span> /&gt;</span>
-    <span class="hljs-tag">&lt;/<span class="hljs-title">div</span>&gt;</span>)</span>;
+    return (&lt;div&gt;
+      &lt;Dnd data={this.state.data}
+        onEndDrag={this.onEndDrag.bind(this)}
+        onDrop={this.onEndDrag.bind(this)}
+        onMoveCard={this.onEndDrag.bind(this)}
+        onEnterBlock={this.onEndDrag.bind(this)}
+        &gt;
+        {data.map((block, index) =&gt; {
+          return (&lt;Block key={index}&gt;
+            &lt;div&gt;
+            {block.cards.map((card, i) =&gt; {
+              return (&lt;Card key={card.id}
+                  placeholder={card._placeholder}
+                  bIndex={index}
+                  content={card.content} /&gt;)
+            })}
+            &lt;/div&gt;
+          &lt;/Block&gt;);
+        })}
+      &lt;/Dnd&gt;
+    &lt;/div&gt;);
   }
 }
 
 
-ReactDOM.render(<span class="xml"><span class="hljs-tag">&lt;<span class="hljs-title">div</span>&gt;</span>
-  <span class="hljs-tag">&lt;<span class="hljs-title">p</span>&gt;</span>Github：
-  <span class="hljs-tag">&lt;<span class="hljs-title">a</span> <span class="hljs-attribute">href</span>=<span class="hljs-value">"https://github.com/warmhug/rci-dnd"</span>&gt;</span>https://github.com/warmhug/rci-dnd<span class="hljs-tag">&lt;/<span class="hljs-title">a</span>&gt;</span>
-  <span class="hljs-tag">&lt;/<span class="hljs-title">p</span>&gt;</span>
-  <span class="hljs-tag">&lt;<span class="hljs-title">Demo</span> /&gt;</span>
-<span class="hljs-tag">&lt;/<span class="hljs-title">div</span>&gt;</span>, document.getElementById('__react-content'));
-</span></code></pre></div>
+ReactDOM.render(&lt;div&gt;
+  &lt;p&gt;Github：
+  &lt;a href="https://github.com/warmhug/rci-dnd"&gt;https://github.com/warmhug/rci-dnd&lt;/a&gt;
+  &lt;/p&gt;
+  &lt;Demo /&gt;
+&lt;/div&gt;, document.getElementById('__react-content'));
+</code></pre></div>
   </div>
   <a href="https://github.com/react-component/rci-dnd">
     <img style="position: absolute; top: 0; right: 0; border: 0;"
