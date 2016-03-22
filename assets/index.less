@@ -1,0 +1,26 @@
+@dndPrefixCls: rci-dnd;
+.@{dndPrefixCls} {
+  display: flex;
+  &-block {
+    flex: 1;
+    border: 1px solid #ccc;
+    padding: 10px;
+    margin: 0 10px 0 0;
+  }
+  &-card {
+    cursor: move;
+    opacity: 1;
+    border: 1px solid #ddd;
+    margin: 10px 0;
+    &-dragging {
+      opacity: 0;
+    }
+    &-over {
+      background-color: #eee;
+    }
+  }
+  &-placeholder {
+    height: 20px;
+    background-color: #ccc;
+  }
+}
