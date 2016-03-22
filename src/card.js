@@ -2,24 +2,21 @@ import React, { Component } from 'react';
 import { findDOMNode } from 'react-dom';
 import { DragSource, DropTarget } from 'react-dnd';
 import flow from 'lodash/flow';
-
+import classNames from 'classnames';
 
 const dSource = {
   beginDrag(props) {
     return {
-      id: props.id,
       index: props.index,
       bIndex: props.bIndex
     };
   },
   endDrag(props, monitor, component) {
-    props.endDrag();
+    props.onEndDrag();
   }
 };
 
 const dTarget = {
-  drop(props, monitor, component) {
-  },
   hover(props, monitor, component) {
     const dragInfo = monitor.getItem();
     const dragIndex = dragInfo.index;
@@ -40,7 +37,7 @@ const dTarget = {
     const hoverBoundingRect = findDOMNode(component).getBoundingClientRect();
 
     if (dragBIndex !== bIndex) {
-      props.moveCard(dragBIndex, dragIndex, bIndex, hoverIndex, hoverBoundingRect);
+      props.onMoveCard(dragBIndex, dragIndex, bIndex, hoverIndex, hoverBoundingRect);
       return;
     }
 
@@ -64,7 +61,7 @@ const dTarget = {
     }
 
     // Time to actually perform the action
-    props.moveCard(dragBIndex, dragIndex, bIndex, hoverIndex);
+    props.onMoveCard(dragBIndex, dragIndex, bIndex, hoverIndex);
 
     // Note: we're mutating the monitor item here!
     // Generally it's better to avoid mutations,
@@ -77,21 +74,17 @@ const dTarget = {
 class Card extends Component {
   constructor(props) {
     super(props);
-    // this.state = {
-    //   hide: false,
-    // };
   }
   render() {
-    const { isDragging, hide, isOver, text, connectDragSource, connectDropTarget } = this.props;
-    // console.log('card', isOver);
+    const { prefixCls, isDragging, isOver, content, connectDragSource, connectDropTarget } = this.props;
+    const cls = {
+      [`${prefixCls}-card`]: true,
+      [`${prefixCls}-card-dragging`]: isDragging,
+      [`${prefixCls}-card-over`]: isOver,
+    };
     return connectDragSource(connectDropTarget(
-      <div className="card" style={{
-        fontSize: 24,
-        cursor: 'move',
-        opacity: isDragging || hide ? 0 : 1,
-        backgroundColor: isOver ? 'red' : ''
-      }}>
-        {text}
+      <div className={classNames(cls)}>
+        {content}
       </div>
     ));
   }
@@ -103,7 +96,6 @@ export default flow(
       connectDragSource: connect.dragSource(),
       // connectDragPreview: connect.dragPreview(),
       isDragging: monitor.isDragging(),
-      hide: false,
     };
   }),
   DropTarget('dnd', dTarget, (connect, monitor) => ({
