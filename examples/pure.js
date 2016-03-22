@@ -23,7 +23,7 @@ webpackJsonp([0],[
 	
 	var _reactDom2 = _interopRequireDefault(_reactDom);
 	
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 	
 	// use jsx to render html, do not modify simple.html
 	
@@ -35,7 +35,7 @@ webpackJsonp([0],[
 	var placeholder = document.createElement("li");
 	placeholder.className = "placeholder";
 	
-	var List = _react2.default.createClass({
+	var List = _react2["default"].createClass({
 	  displayName: 'List',
 	
 	  getInitialState: function getInitialState() {
@@ -78,11 +78,11 @@ webpackJsonp([0],[
 	    }
 	  },
 	  render: function render() {
-	    return _react2.default.createElement(
+	    return _react2["default"].createElement(
 	      'ul',
 	      { onDragOver: this.dragOver },
 	      this.state.data.map(function (item, i) {
-	        return _react2.default.createElement(
+	        return _react2["default"].createElement(
 	          'li',
 	          {
 	            'data-id': i,
@@ -98,20 +98,20 @@ webpackJsonp([0],[
 	  }
 	});
 	
-	_reactDom2.default.render(_react2.default.createElement(
+	_reactDom2["default"].render(_react2["default"].createElement(
 	  'div',
 	  null,
-	  _react2.default.createElement(
+	  _react2["default"].createElement(
 	    'p',
 	    null,
 	    'Github：',
-	    _react2.default.createElement(
+	    _react2["default"].createElement(
 	      'a',
 	      { href: 'https://github.com/warmhug/react-dnd-demo' },
 	      'https://github.com/warmhug/react-dnd-demo'
 	    )
 	  ),
-	  _react2.default.createElement(List, { data: colors })
+	  _react2["default"].createElement(List, { data: colors })
 	), document.getElementById('__react-content'));
 
 /***/ },

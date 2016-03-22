@@ -1,10 +1,10 @@
-.dnd-container {
+.rci-dnd {
   display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
   display: flex;
 }
-.dnd-container .block {
+.rci-dnd-block {
   -webkit-box-flex: 1;
   -webkit-flex: 1;
       -ms-flex: 1;
@@ -13,12 +13,21 @@
   padding: 10px;
   margin: 0 10px 0 0;
 }
-.dnd-container .card {
+.rci-dnd-card {
+  cursor: move;
+  opacity: 1;
   border: 1px solid #ddd;
   margin: 10px 0;
 }
-.dnd-container .infi-item {
-  height: 40px;
+.rci-dnd-card-dragging {
+  opacity: 0;
+}
+.rci-dnd-card-over {
+  background-color: #eee;
+}
+.rci-dnd-placeholder {
+  height: 20px;
+  background-color: #ccc;
 }
 
 /*# sourceMappingURL=simple.css.map*/
