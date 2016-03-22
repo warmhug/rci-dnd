@@ -40,5 +40,20 @@ npm start
 - [angular-drag-and-drop-lists](https://github.com/marceljuenemann/angular-drag-and-drop-lists)
 
 
+## Test Case
+
+```
+npm test
+npm run chrome-test
+```
+
+## Coverage
+
+```
+npm run coverage
+```
+
+open coverage/ dir
+
 ## License
 rc-tree is released under the MIT license.
