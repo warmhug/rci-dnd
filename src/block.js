@@ -38,7 +38,7 @@ class Block extends Component {
   render() {
     const { connectDropTarget, children, prefixCls } = this.props;
     // const { hasDropped } = this.state;
-
+// console.log(this.props, 'ddd');
     return connectDropTarget(
       <div className={`${prefixCls}-block`}>
         {children}

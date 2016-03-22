@@ -37,7 +37,7 @@ class Dnd extends Component {
   onEndDrag() {
     const blocks = [...this.props.data];
     this.resetPhIndex(blocks);
-    this.setState({blocks});
+    // this.setState({blocks});
     hoverCardIndex = undefined;
     dropIndex = undefined;
     cardRect = undefined;
@@ -55,13 +55,15 @@ class Dnd extends Component {
       }
 
       this.resetPhIndex(blocks);
-      this.setState({blocks});
+      // this.setState({blocks});
+      this.props.onMoveCard(blocks);
       return;
     }
 
     const removed = blocks[dragBIndex].cards.splice(dragIndex, 1);
     blocks[bIndex].cards.splice(hoverIndex, 0, removed[0]);
-    this.setState({blocks});
+    // this.setState({blocks});
+    this.props.onMoveCard(blocks);
   }
 
   onEnterBlock(dragBIndex, dragIndex, bIndex, flag, mouseOffset) {
@@ -87,7 +89,8 @@ class Dnd extends Component {
     if (flag === 'hover') {
       blocks[bIndex].cards.splice(dropIndex, 0, {id: makeId(), content: '', _placeholder: true});
       phIndex[0] = [bIndex, dropIndex];
-      this.setState({blocks});
+      // this.setState({blocks});
+      this.props.onEnterBlock(blocks);
     } else if (flag == 'drop') {
       if (!cardRect) {
         dropIndex -= 1;
@@ -96,44 +99,54 @@ class Dnd extends Component {
       const removed = blocks[dragBIndex].cards.splice(dragIndex, 1);
       blocks[bIndex].cards[dropIndex] = removed[0];
       phIndex = [];
-      this.setState({blocks});
+      // this.setState({blocks});
+      this.props.onDrop(blocks);
     }
   }
 
+  recursiveCloneChildren(children) {
+    const props = this.props;
+    return React.Children.map(children, (child, index) => {
+      let childProps = {};
+      if (React.isValidElement(child)) {
+        if (child.type == Block) {
+          childProps = {
+            prefixCls: props.prefixCls,
+            index,
+            onEnterBlock: this.onEnterBlock,
+          };
+        }
+        if (child.type == Card) {
+          childProps = {
+            prefixCls: props.prefixCls,
+            index,
+            onEndDrag: this.onEndDrag,
+            onMoveCard: this.onMoveCard,
+          };
+        }
+      }
+      childProps.children = this.recursiveCloneChildren(child.props.children);
+      return React.cloneElement(child, childProps);
+    })
+  }
+
   render() {
-    const { className, prefixCls, placeholderCls, data } = this.props;
+    const { className, prefixCls, data, children } = this.props;
+    const newChildren = this.recursiveCloneChildren(children);
     return (<div className={classNames(className, prefixCls)}>
-      {data.map((block, index) => {
-        return (<Block prefixCls={prefixCls}
-          key={index}
-          index={index}
-          onEnterBlock={this.onEnterBlock}
-          >
-          {block.cards.map((card, i) => {
-            return card._placeholder ? <div key={card.id}
-                className={classNames(placeholderCls, `${prefixCls}-placeholder`)}></div> :
-              <Card prefixCls={prefixCls}
-                key={card.id}
-                index={i}
-                bIndex={index}
-                content={card.content}
-                onEndDrag={this.onEndDrag}
-                onMoveCard={this.onMoveCard} />
-          })}
-        </Block>);
-      })}
+      {newChildren}
     </div>);
   }
 }
+
 Dnd.propTypes = {
+  children: PropTypes.any,
   prefixCls: PropTypes.string,
-  placeholderCls: PropTypes.string,
   data: PropTypes.array,
   onEndDrag: PropTypes.func,
 };
 Dnd.defaultProps = {
   prefixCls: 'rci-dnd',
-  placeholderCls: '',
   onEndDrag: () => {},
 }
 

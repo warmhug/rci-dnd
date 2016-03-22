@@ -75,14 +75,18 @@ class Card extends Component {
   constructor(props) {
     super(props);
   }
+
   render() {
-    const { prefixCls, isDragging, isOver, content, connectDragSource, connectDropTarget } = this.props;
+    const { prefixCls, placeholder, isDragging, isOver, content, connectDragSource, connectDropTarget } = this.props;
     const cls = {
       [`${prefixCls}-card`]: true,
+      [`${prefixCls}-card-placeholder`]: placeholder,
       [`${prefixCls}-card-dragging`]: isDragging,
       [`${prefixCls}-card-over`]: isOver,
     };
-    return connectDragSource(connectDropTarget(
+    // console.log(this.props);
+    return placeholder ? <div className={classNames(cls)}></div> :
+      connectDragSource(connectDropTarget(
       <div className={classNames(cls)}>
         {content}
       </div>
