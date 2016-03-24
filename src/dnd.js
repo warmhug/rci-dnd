@@ -87,7 +87,7 @@ class Dnd extends Component {
     }
 
     if (flag === 'hover') {
-      blocks[bIndex].cards.splice(dropIndex, 0, {id: makeId(), content: '', _placeholder: true});
+      blocks[bIndex].cards.splice(dropIndex, 0, {id: makeId(), _placeholder: true, content: ''});
       phIndex[0] = [bIndex, dropIndex];
       // this.setState({blocks});
       this.props.onEnterBlock(blocks);

@@ -84,8 +84,7 @@ class Card extends Component {
       [`${prefixCls}-card-dragging`]: isDragging,
       [`${prefixCls}-card-over`]: isOver,
     };
-    // console.log(this.props);
-    return placeholder ? <div className={classNames(cls, className)}></div> :
+    return placeholder ? <div className={classNames(cls, className)}>{content}</div> :
       connectDragSource(connectDropTarget(
       <div className={classNames(cls, className)}>
         {content}

@@ -21,7 +21,6 @@ React-dnd
 |----------|----------------|----------|--------------|
 |className | additional css class of root dom node | String | '' |
 |prefixCls | prefix class | String | 'rci-dnd' |
-|placeholderCls | placeholder className | String | 'rci-placeholder' |
 |data | data of dnd (unique id across all data) | Array | [{id:Number/String, content:Node/any},] |
 
 ### Block props
