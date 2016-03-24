@@ -55,11 +55,10 @@ npm start
 - [angular-drag-and-drop-lists](https://github.com/marceljuenemann/angular-drag-and-drop-lists)
 
 ### infinite scroll
-- [https://github.com/orgsync/react-list](https://github.com/orgsync/react-list)
-    - [issue](https://github.com/orgsync/react-list/issues/97)
 - [https://github.com/seatgeek/react-infinite](https://github.com/seatgeek/react-infinite)
     - [dynamic-height](http://stackoverflow.com/questions/30579045/react-infinite-scroll-in-a-container-with-dynamic-height)，[issue 62](https://github.com/seatgeek/react-infinite/issues/62)
-    - Not Good! need to pass the containerHeight and the elementHeight to the element.
+- [https://github.com/orgsync/react-list](https://github.com/orgsync/react-list)
+    - [issue](https://github.com/orgsync/react-list/issues/97)
 
 ## Test Case
 
