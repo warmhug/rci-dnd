@@ -2,7 +2,7 @@
 <html>
 
 <head>
-  <title>simple.js - example - rci-dnd@0.3.0</title>
+  <title>simple.js - example - rci-dnd@0.3.1</title>
   <meta name="viewport"
         content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no">
   <meta charset="utf-8"/>
@@ -258,7 +258,7 @@ Monokai Sublime style. Derived from Monokai by noformnocontent http://nn.mit-lic
 <body>
   <div class="container">
     <div class="header">
-      <h1>rci-dnd@0.3.0</h1>
+      <h1>rci-dnd@0.3.1</h1>
 
       <p>dnd ui component for react</p>
     </div>
@@ -271,62 +271,34 @@ import ReactDOM from 'react-dom';
 
 import 'rci-dnd/assets/index.css';
 import './demo.less';
-import Dnd from 'rci-dnd';
-import data from './data';
-
-// import InfiniteScrollFn from 'react-infinite-scroll';
-// const InfiniteScroll = InfiniteScrollFn(React);
 import Infinite from 'react-infinite';
 
+import Dnd from 'rci-dnd';
+import data from './data';
 const Block = Dnd.Block;
 const Card = Dnd.Card;
-
-function buildElements(start, end) {
-  var elements = [];
-  for (var i = start; i &lt; end; i++) {
-    elements.push(&lt;div key={i} className="infi-item"&gt;
-      List Item {i}
-    &lt;/div&gt;);
-  }
-  return elements;
-}
 
 class Demo extends Component {
   constructor(props) {
     super(props);
     this.state = {
       data,
-      isInfiniteLoading: false,
-      elements: buildElements(0, 20),
     };
   }
-  handleInfiniteLoad(bIndex) {
-    console.log('load', arguments);
-    this.setState({
-      isInfiniteLoading: true
-    });
-    setTimeout(() =&gt; {
-      var elemLength = this.state.elements.length,
-          newElements = buildElements(elemLength, elemLength + 30);
-      this.setState({
-        isInfiniteLoading: false,
-        elements: this.state.elements.concat(newElements)
-      });
-    }, 1000);
+  componentWillMount() {
+
   }
   onEndDrag(data) {
     this.setState({data});
   }
   render() {
-    const infi = &lt;Infinite elementHeight={40}
-      containerHeight={250}
-      infiniteLoadBeginEdgeOffset={200}
-      onInfiniteLoad={this.handleInfiniteLoad.bind(this)}
-      loadingSpinnerDelegate={&lt;div className="infi-item"&gt;Loading...&lt;/div&gt;}
-      isInfiniteLoading={this.state.isInfiniteLoading}&gt;
-      {this.state.elements}
-    &lt;/Infinite&gt;;
-
+    const ct = &lt;div&gt;&lt;p&gt;params&lt;/p&gt;sde&lt;/div&gt;;
+    const cards = (block, index) =&gt; block.cards.map((card, i) =&gt; {
+      return (&lt;Card key={card.id} index={i}
+          bIndex={index}
+          placeholder={card._placeholder}
+          content={ct || card.content} /&gt;)
+    });
     return (&lt;div&gt;
       &lt;Dnd data={this.state.data}
         onEndDrag={this.onEndDrag.bind(this)}
@@ -337,14 +309,7 @@ class Demo extends Component {
         {data.map((block, index) =&gt; {
           return (&lt;Block key={index} index={index}&gt;
             &lt;h3&gt;col - {index}&lt;/h3&gt;
-            &lt;div&gt;
-            {block.cards.map((card, i) =&gt; {
-              return (&lt;Card key={card.id} index={i}
-                  bIndex={index}
-                  placeholder={card._placeholder}
-                  content={card.content} /&gt;)
-            })}
-            &lt;/div&gt;
+            {cards(block, index)}
           &lt;/Block&gt;);
         })}
       &lt;/Dnd&gt;

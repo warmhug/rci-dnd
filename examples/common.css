@@ -1,5 +1,13 @@
 body > a {
   display: none;
 }
+.infi {
+  margin: 10px;
+  border: 1px solid #ddd;
+}
+.infi-item {
+  height: 40px;
+  border-bottom: 1px solid #ccc;
+}
 
 /*# sourceMappingURL=common.css.map*/
