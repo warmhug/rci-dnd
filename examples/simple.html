@@ -2,7 +2,7 @@
 <html>
 
 <head>
-  <title>simple.js - example - rci-dnd@0.3.1</title>
+  <title>simple.js - example - rci-dnd@0.3.2</title>
   <meta name="viewport"
         content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no">
   <meta charset="utf-8"/>
@@ -258,7 +258,7 @@ Monokai Sublime style. Derived from Monokai by noformnocontent http://nn.mit-lic
 <body>
   <div class="container">
     <div class="header">
-      <h1>rci-dnd@0.3.1</h1>
+      <h1>rci-dnd@0.3.2</h1>
 
       <p>dnd ui component for react</p>
     </div>
@@ -271,6 +271,8 @@ import ReactDOM from 'react-dom';
 
 import 'rci-dnd/assets/index.css';
 import './demo.less';
+import 'antd/lib/index.css';
+import { Icon } from 'antd';
 import Infinite from 'react-infinite';
 
 import Dnd from 'rci-dnd';
@@ -286,19 +288,13 @@ class Demo extends Component {
     };
   }
   componentWillMount() {
-
+    console.log(ReactDOM.findDOMNode(this.refs.block));
   }
   onEndDrag(data) {
     this.setState({data});
   }
   render() {
     const ct = &lt;div&gt;&lt;p&gt;params&lt;/p&gt;sde&lt;/div&gt;;
-    const cards = (block, index) =&gt; block.cards.map((card, i) =&gt; {
-      return (&lt;Card key={card.id} index={i}
-          bIndex={index}
-          placeholder={card._placeholder}
-          content={ct || card.content} /&gt;)
-    });
     return (&lt;div&gt;
       &lt;Dnd data={this.state.data}
         onEndDrag={this.onEndDrag.bind(this)}
@@ -307,9 +303,15 @@ class Demo extends Component {
         onEnterBlock={this.onEndDrag.bind(this)}
         &gt;
         {data.map((block, index) =&gt; {
-          return (&lt;Block key={index} index={index}&gt;
-            &lt;h3&gt;col - {index}&lt;/h3&gt;
-            {cards(block, index)}
+          return (&lt;Block key={index} index={index} ref="block"&gt;
+            &lt;h3&gt;col - {index} &lt;Icon type="link" /&gt;&lt;/h3&gt;
+            {null}
+            {block.cards.map((card, i) =&gt; {
+              return (&lt;Card key={card.id} index={i}
+                  bIndex={index}
+                  placeholder={card._placeholder}
+                  content={ct || card.content} /&gt;)
+            })}
           &lt;/Block&gt;);
         })}
       &lt;/Dnd&gt;
