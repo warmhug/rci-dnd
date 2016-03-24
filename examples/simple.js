@@ -69,12 +69,13 @@ class Demo extends Component {
         onEnterBlock={this.onEndDrag.bind(this)}
         >
         {data.map((block, index) => {
-          return (<Block key={index}>
+          return (<Block key={index} index={index}>
+            <h3>col - {index}</h3>
             <div>
             {block.cards.map((card, i) => {
-              return (<Card key={card.id}
-                  placeholder={card._placeholder}
+              return (<Card key={card.id} index={i}
                   bIndex={index}
+                  placeholder={card._placeholder}
                   content={card.content} />)
             })}
             </div>

@@ -15,7 +15,7 @@ React-dnd
 
 ## API
 
-### props
+### Dnd props
 
 | name     | description    | type     | default      |
 |----------|----------------|----------|--------------|
@@ -24,6 +24,22 @@ React-dnd
 |placeholderCls | placeholder className | String | 'rci-placeholder' |
 |data | data of dnd (unique id across all data) | Array | [{id:Number/String, content:Node/any},] |
 
+### Block props
+
+| name     | description    | type     | default      |
+|----------|----------------|----------|--------------|
+|className | additional css class of root dom node | String | '' |
+|index | the index of Block | Number |  |
+
+### Card props
+
+| name     | description    | type     | default      |
+|----------|----------------|----------|--------------|
+|className | additional css class of root dom node | String | '' |
+|index | the index of Card | Number |  |
+|bIndex | the index of Block (Card inside) | Number |  |
+|placeholder | the placeholder of Card in Block (it's temporary appear) | bool |  |
+|content | the content of Card | node |  |
 
 ## Development
 

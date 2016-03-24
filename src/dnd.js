@@ -112,21 +112,26 @@ class Dnd extends Component {
         if (child.type == Block) {
           childProps = {
             prefixCls: props.prefixCls,
-            index,
+            // index, // need user config
             onEnterBlock: this.onEnterBlock,
           };
         }
         if (child.type == Card) {
           childProps = {
             prefixCls: props.prefixCls,
-            index,
+            // index,
             onEndDrag: this.onEndDrag,
             onMoveCard: this.onMoveCard,
           };
         }
       }
-      childProps.children = this.recursiveCloneChildren(child.props.children);
-      return React.cloneElement(child, childProps);
+      // console.log(child.props.children);
+      if (child.props) {
+        // String has no Prop
+        childProps.children = this.recursiveCloneChildren(child.props.children);
+        return React.cloneElement(child, childProps);
+      }
+      return child;
     })
   }
 
