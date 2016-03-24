@@ -5,6 +5,9 @@ body > a {
   margin: 10px;
   border: 1px solid #ddd;
 }
+.infi-container {
+  height: 400px;
+}
 .infi-item {
   height: 40px;
   border-bottom: 1px solid #ccc;
