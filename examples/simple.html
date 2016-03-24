@@ -2,7 +2,7 @@
 <html>
 
 <head>
-  <title>simple.js - example - rci-dnd@0.2.0</title>
+  <title>simple.js - example - rci-dnd@0.3.0</title>
   <meta name="viewport"
         content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no">
   <meta charset="utf-8"/>
@@ -258,7 +258,7 @@ Monokai Sublime style. Derived from Monokai by noformnocontent http://nn.mit-lic
 <body>
   <div class="container">
     <div class="header">
-      <h1>rci-dnd@0.2.0</h1>
+      <h1>rci-dnd@0.3.0</h1>
 
       <p>dnd ui component for react</p>
     </div>
@@ -335,12 +335,13 @@ class Demo extends Component {
         onEnterBlock={this.onEndDrag.bind(this)}
         &gt;
         {data.map((block, index) =&gt; {
-          return (&lt;Block key={index}&gt;
+          return (&lt;Block key={index} index={index}&gt;
+            &lt;h3&gt;col - {index}&lt;/h3&gt;
             &lt;div&gt;
             {block.cards.map((card, i) =&gt; {
-              return (&lt;Card key={card.id}
-                  placeholder={card._placeholder}
+              return (&lt;Card key={card.id} index={i}
                   bIndex={index}
+                  placeholder={card._placeholder}
                   content={card.content} /&gt;)
             })}
             &lt;/div&gt;

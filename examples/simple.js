@@ -297,14 +297,20 @@ webpackJsonp([1],[
 	          _data2["default"].map(function (block, index) {
 	            return _react2["default"].createElement(
 	              Block,
-	              { key: index },
+	              { key: index, index: index },
+	              _react2["default"].createElement(
+	                'h3',
+	                null,
+	                'col - ',
+	                index
+	              ),
 	              _react2["default"].createElement(
 	                'div',
 	                null,
 	                block.cards.map(function (card, i) {
-	                  return _react2["default"].createElement(Card, { key: card.id,
-	                    placeholder: card._placeholder,
+	                  return _react2["default"].createElement(Card, { key: card.id, index: i,
 	                    bIndex: index,
+	                    placeholder: card._placeholder,
 	                    content: card.content });
 	                })
 	              )
@@ -554,21 +560,26 @@ webpackJsonp([1],[
 	          if (child.type == _block2["default"]) {
 	            childProps = {
 	              prefixCls: props.prefixCls,
-	              index: index,
+	              // index, // need user config
 	              onEnterBlock: _this2.onEnterBlock
 	            };
 	          }
 	          if (child.type == _card2["default"]) {
 	            childProps = {
 	              prefixCls: props.prefixCls,
-	              index: index,
+	              // index,
 	              onEndDrag: _this2.onEndDrag,
 	              onMoveCard: _this2.onMoveCard
 	            };
 	          }
 	        }
-	        childProps.children = _this2.recursiveCloneChildren(child.props.children);
-	        return _react2["default"].cloneElement(child, childProps);
+	        // console.log(child.props.children);
+	        if (child.props) {
+	          // String has no Prop
+	          childProps.children = _this2.recursiveCloneChildren(child.props.children);
+	          return _react2["default"].cloneElement(child, childProps);
+	        }
+	        return child;
 	      });
 	    }
 	  }, {
@@ -8381,13 +8392,14 @@ webpackJsonp([1],[
 	      var _props = this.props;
 	      var prefixCls = _props.prefixCls;
 	      var placeholder = _props.placeholder;
+	      var className = _props.className;
 	      var isDragging = _props.isDragging;
 	      var isOver = _props.isOver;
 	      var content = _props.content;
 	      var connectDragSource = _props.connectDragSource;
 	      var connectDropTarget = _props.connectDropTarget;
 	
-	      var cls = (_cls = {}, _defineProperty(_cls, prefixCls + '-card', true), _defineProperty(_cls, prefixCls + '-card-placeholder', placeholder), _defineProperty(_cls, prefixCls + '-card-dragging', isDragging), _defineProperty(_cls, prefixCls + '-card-over', isOver), _cls);
+	      var cls = (_cls = {}, _defineProperty(_cls, prefixCls + '-card', true), _defineProperty(_cls, prefixCls + '-card-placeholder', placeholder), _defineProperty(_cls, prefixCls + '-card-dragging', isDragging), _defineProperty(_cls, prefixCls + '-card-over', isOver), _defineProperty(_cls, className, true), _cls);
 	      // console.log(this.props);
 	      return placeholder ? _react2["default"].createElement('div', { className: (0, _classnames2["default"])(cls) }) : connectDragSource(connectDropTarget(_react2["default"].createElement(
 	        'div',
@@ -8983,6 +8995,10 @@ webpackJsonp([1],[
 	
 	var _react2 = _interopRequireDefault(_react);
 	
+	var _classnames = __webpack_require__(167);
+	
+	var _classnames2 = _interopRequireDefault(_classnames);
+	
 	var _reactDnd = __webpack_require__(168);
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
@@ -9032,13 +9048,14 @@ webpackJsonp([1],[
 	      var _props = this.props;
 	      var connectDropTarget = _props.connectDropTarget;
 	      var children = _props.children;
+	      var className = _props.className;
 	      var prefixCls = _props.prefixCls;
 	      // const { hasDropped } = this.state;
 	      // console.log(this.props, 'ddd');
 	
 	      return connectDropTarget(_react2["default"].createElement(
 	        'div',
-	        { className: prefixCls + '-block' },
+	        { className: (0, _classnames2["default"])(prefixCls + '-block', className) },
 	        children
 	      ));
 	    }
