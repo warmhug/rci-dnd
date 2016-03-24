@@ -1,4 +1,5 @@
 import React, { Component, PropTypes } from 'react';
+import classNames from 'classnames';
 import { DropTarget } from 'react-dnd';
 
 const boxTarget = {
@@ -36,11 +37,11 @@ class Block extends Component {
   }
 
   render() {
-    const { connectDropTarget, children, prefixCls } = this.props;
+    const { connectDropTarget, children, className, prefixCls } = this.props;
     // const { hasDropped } = this.state;
 // console.log(this.props, 'ddd');
     return connectDropTarget(
-      <div className={`${prefixCls}-block`}>
+      <div className={classNames(`${prefixCls}-block`, className)}>
         {children}
       </div>
     );
