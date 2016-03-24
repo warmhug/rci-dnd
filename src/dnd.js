@@ -126,8 +126,8 @@ class Dnd extends Component {
         }
       }
       // console.log(child.props.children);
-      if (child.props) {
-        // String has no Prop
+      if (child && child.props) {
+        // null or String has no Prop
         childProps.children = this.recursiveCloneChildren(child.props.children);
         return React.cloneElement(child, childProps);
       }

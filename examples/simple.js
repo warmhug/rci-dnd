@@ -5,6 +5,8 @@ import ReactDOM from 'react-dom';
 
 import 'rci-dnd/assets/index.less';
 import './demo.less';
+import 'antd/lib/index.css';
+import { Icon } from 'antd';
 import Infinite from 'react-infinite';
 
 import Dnd from 'rci-dnd';
@@ -20,19 +22,13 @@ class Demo extends Component {
     };
   }
   componentWillMount() {
-
+    console.log(ReactDOM.findDOMNode(this.refs.block));
   }
   onEndDrag(data) {
     this.setState({data});
   }
   render() {
     const ct = <div><p>params</p>sde</div>;
-    const cards = (block, index) => block.cards.map((card, i) => {
-      return (<Card key={card.id} index={i}
-          bIndex={index}
-          placeholder={card._placeholder}
-          content={ct || card.content} />)
-    });
     return (<div>
       <Dnd data={this.state.data}
         onEndDrag={this.onEndDrag.bind(this)}
@@ -41,9 +37,15 @@ class Demo extends Component {
         onEnterBlock={this.onEndDrag.bind(this)}
         >
         {data.map((block, index) => {
-          return (<Block key={index} index={index}>
-            <h3>col - {index}</h3>
-            {cards(block, index)}
+          return (<Block key={index} index={index} ref="block">
+            <h3>col - {index} <Icon type="link" /></h3>
+            {null}
+            {block.cards.map((card, i) => {
+              return (<Card key={card.id} index={i}
+                  bIndex={index}
+                  placeholder={card._placeholder}
+                  content={ct || card.content} />)
+            })}
           </Block>);
         })}
       </Dnd>
