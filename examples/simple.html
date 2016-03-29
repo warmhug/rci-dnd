@@ -2,7 +2,7 @@
 <html>
 
 <head>
-  <title>simple.js - example - rci-dnd@0.3.2</title>
+  <title>simple.js - example - rci-dnd@0.4.0</title>
   <meta name="viewport"
         content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no">
   <meta charset="utf-8"/>
@@ -258,7 +258,7 @@ Monokai Sublime style. Derived from Monokai by noformnocontent http://nn.mit-lic
 <body>
   <div class="container">
     <div class="header">
-      <h1>rci-dnd@0.3.2</h1>
+      <h1>rci-dnd@0.4.0</h1>
 
       <p>dnd ui component for react</p>
     </div>
@@ -271,108 +271,182 @@ import ReactDOM from 'react-dom';
 
 import 'rci-dnd/assets/index.css';
 import './demo.less';
-// import 'antd/lib/index.css';
-import { Icon } from 'antd';
 import Infinite from 'react-infinite';
 
 import Dnd from 'rci-dnd';
-import data from './data';
 const Block = Dnd.Block;
 const Card = Dnd.Card;
 
-let _start = 100;
-function addData() {
+let _start = 0;
+function addData(flag) {
   var added = [];
   for (let i = 0; i &lt; 10; i++) {
-    _start += i;
-    added.push({id: _start, content: `item-${_start}`});
+    _start++;
+    added.push({id: _start, content: `♘ ${_start}`, _height: parseInt(Math.random() * 20 + 20)});
   }
-  _start += Date.now();
+  // if (flag) {
+    // _start += Date.now();
+  // }
   return added;
 }
 
+let containerHeight = 250;
 let defaultElementHeight = 23;
+let elementHeight =[];
+let cardsLen = 0;
+const cardsHeight = {};
+
+const initState = {
+  data: [],
+  isInfiniteLoading: [],
+  containerHeight,
+  elementHeight,
+};
+
+function getState() {
+  const data = [];
+  for (var i = 0; i &lt; 4; i++) {
+    data.push({cards: addData()});
+  }
+
+  data.forEach((block, index) =&gt; {
+    cardsLen += block.cards.length;
+  });
+
+  return {
+    data,
+    isInfiniteLoading: data.map(item =&gt; false),
+    containerHeight,
+    elementHeight: data.map(item =&gt; item.cards.map(ii =&gt; defaultElementHeight)),
+  };
+}
 
 class Demo extends Component {
   constructor(props) {
     super(props);
-    this.state = {
-      data,
-      isInfiniteLoading: false,
-      containerHeight: 250,
-      elementHeight: data.map(item =&gt; item.cards.map(ii =&gt; defaultElementHeight)),
-    };
+    this.state = initState;
+    // this.state = getState();
   }
   componentDidMount() {
+    setTimeout(() =&gt; {
+      // simulate ajax
+      this.setState(getState());
+    }, 500);
+  }
+  componentDidUpdate() {}
+
+  getCardHeight(bIndex, index, height) {
+    cardsHeight[`block-${bIndex}-card-${index}`] = height;
+    cardsLen--;
+    if (!cardsLen) {
+      // console.log('all did mount');
+      this.setState({
+        elementHeight: this.getNewInfiElementHeight(this.state.data),
+      });
+    }
+  }
+
+  getNewInfiElementHeight(data) {
     const elementHeight = [...this.state.elementHeight];
-    this.state.data.forEach((block, index) =&gt; {
+    data.forEach((block, index) =&gt; {
       elementHeight[index] = [];
       block.cards.forEach((card, i) =&gt; {
-        let height = defaultElementHeight;
-        if (this.refs[`block-${index}-card-${i}`]) {
-          height = ReactDOM.findDOMNode(this.refs[`block-${index}-card-${i}`]).offsetHeight;
-        }
-        elementHeight[index].push(height);
-      })
-    })
+        elementHeight[index].push(cardsHeight[`block-${index}-card-${i}`] || defaultElementHeight);
+      });
+    });
+    return elementHeight;
+  }
+  getBlockHeight(bIndex, height) {
     this.setState({
-      containerHeight: ReactDOM.findDOMNode(this.refs['block-0']).offsetHeight,
-      elementHeight,
+      containerHeight: height - 50 || containerHeight,
     });
   }
+
   handleInfiniteLoad(bIndex) {
     this.setState({
-      isInfiniteLoading: true,
+      isInfiniteLoading: [
+        ...this.state.isInfiniteLoading.slice(0, bIndex),
+        true,
+        ...this.state.isInfiniteLoading.slice(bIndex + 1),
+      ],
     });
     setTimeout(() =&gt; {
       // simulate ajax
       const data = this.state.data;
-      const added = addData();
+      const added = addData(true);
       const nData = [
         ...data.slice(0, bIndex),
         {cards: [...data[bIndex].cards, ...added]},
         ...data.slice(bIndex + 1)
       ];
 
-      this.setState({
-        isInfiniteLoading: false,
-        data: nData,
-        elementHeight: nData.map(item =&gt; item.cards.map(ii =&gt; defaultElementHeight)),
-      });
-    }, 1000);
+      cardsLen = added.length;
 
-    // after update dom, set new elementHeight
-    setTimeout(() =&gt; {
-      this.componentDidMount();
-    }, 100)
+      const elementHeight = [...this.state.elementHeight];
+      elementHeight[bIndex] = [...elementHeight[bIndex], ...added.map(ii =&gt; defaultElementHeight)]
+
+      this.setState({
+        isInfiniteLoading: nData.map(item =&gt; false),
+        data: nData,
+        elementHeight,
+      });
+
+    }, 1000);
   }
-  onEndDrag(data) {
+  onEndDrag(e, data, extra) {
+    let elementHeight = [...this.state.elementHeight];
+
+    if (e === 'moveCard' &amp;&amp; extra === 'across') {
+      elementHeight = this.getNewInfiElementHeight(data);
+    }
+
+    if (e === 'enterBlock') {
+      // add placeholder height
+      elementHeight[extra[0]].splice(extra[1], 0, defaultElementHeight);
+    }
+    if (e === 'drop') {
+      const {dragBIndex, dragIndex, bIndex, dropIndex} = extra;
+      const removed = elementHeight[dragBIndex].splice(dragIndex, 1);
+      elementHeight[bIndex][dropIndex] = removed[0];
+    }
+    if (e === 'endDrag' &amp;&amp; extra) {
+      // delete placeholder height
+      elementHeight[extra[0]].splice(extra[1], 1);
+    }
+
     this.setState({
       data,
-      elementHeight: data.map(item =&gt; item.cards.map(ii =&gt; defaultElementHeight)),
+      elementHeight,
+      // elementHeight: data.map(item =&gt; item.cards.map(ii =&gt; defaultElementHeight)),
     });
   }
   render() {
+    const { elementHeight, containerHeight, isInfiniteLoading } = this.state;
+    // console.log('render', elementHeight, this.state.data);
+    // ajax-data -&gt; render -&gt; get computed size -&gt; apply new size to Infinite
     return (&lt;div&gt;
       &lt;Dnd data={this.state.data}
-        onEndDrag={this.onEndDrag.bind(this)}
-        onDrop={this.onEndDrag.bind(this)}
-        onMoveCard={this.onEndDrag.bind(this)}
-        onEnterBlock={this.onEndDrag.bind(this)}
+        onEndDrag={this.onEndDrag.bind(this, 'endDrag')}
+        onDrop={this.onEndDrag.bind(this, 'drop')}
+        onMoveCard={this.onEndDrag.bind(this, 'moveCard')}
+        onEnterBlock={this.onEndDrag.bind(this, 'enterBlock')}
         &gt;
-        {this.state.data.map((block, index) =&gt; {
-          return (&lt;Block key={index} index={index}&gt;
-            &lt;h3&gt;col - {index} &lt;Icon type="link" /&gt;&lt;/h3&gt;
+        {this.state.data.length ? this.state.data.map((block, index) =&gt; {
+          return (&lt;Block key={index} index={index}
+              getBlockHeight={this.getBlockHeight.bind(this, index)}&gt;
+            &lt;h3 style={{margin: 0, height: 30}}&gt;col - {index}&lt;/h3&gt;
             &lt;div className="infi-container" ref={`block-${index}`}&gt;
               &lt;Infinite
-                elementHeight={this.state.elementHeight[index]}
-                containerHeight={this.state.containerHeight}
+                elementHeight={elementHeight[index]}
+                containerHeight={containerHeight}
                 infiniteLoadBeginEdgeOffset={20}
                 onInfiniteLoad={this.handleInfiniteLoad.bind(this, index)}
                 loadingSpinnerDelegate={&lt;div className="infi-item"&gt;Loading...&lt;/div&gt;}
-                isInfiniteLoading={this.state.isInfiniteLoading}&gt;
+                isInfiniteLoading={isInfiniteLoading[index]}&gt;
                 {block.cards.map((card, i) =&gt; {
                   return (&lt;Card key={card.id} index={i} ref={`block-${index}-card-${i}`}
+                      style={{height: card._height}}
+                      getCardHeight={this.getCardHeight.bind(this, index, i)}
                       bIndex={index}
                       placeholder={card._placeholder}
                       content={card.content} /&gt;)
@@ -380,7 +454,7 @@ class Demo extends Component {
               &lt;/Infinite&gt;
             &lt;/div&gt;
           &lt;/Block&gt;);
-        })}
+        }) : &lt;div&gt;loading...&lt;/div&gt;}
       &lt;/Dnd&gt;
     &lt;/div&gt;);
   }
