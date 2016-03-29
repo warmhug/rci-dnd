@@ -1,4 +1,5 @@
 import React, { Component, PropTypes } from 'react';
+import { findDOMNode } from 'react-dom';
 import classNames from 'classnames';
 import { DropTarget } from 'react-dnd';
 
@@ -28,6 +29,9 @@ class Block extends Component {
     connectDropTarget: PropTypes.func.isRequired,
     children: PropTypes.node
   }
+  static defaultProps = {
+    getBlockHeight: () => {},
+  }
 
   constructor(props) {
     super(props);
@@ -36,10 +40,14 @@ class Block extends Component {
     // };
   }
 
+  componentDidMount() {
+    this.props.getBlockHeight(findDOMNode(this).offsetHeight);
+  }
+
   render() {
     const { connectDropTarget, children, className, prefixCls } = this.props;
     // const { hasDropped } = this.state;
-// console.log(this.props, 'ddd');
+
     return connectDropTarget(
       <div className={classNames(`${prefixCls}-block`, className)}>
         {children}

@@ -1,8 +1,10 @@
-import React, { Component } from 'react';
+import React, { Component, PropTypes } from 'react';
 import { findDOMNode } from 'react-dom';
 import { DragSource, DropTarget } from 'react-dnd';
 import flow from 'lodash/flow';
 import classNames from 'classnames';
+
+let onceInfo = [];
 
 const dSource = {
   beginDrag(props) {
@@ -37,6 +39,11 @@ const dTarget = {
     const hoverBoundingRect = findDOMNode(component).getBoundingClientRect();
 
     if (dragBIndex !== bIndex) {
+      const k = [dragBIndex, dragIndex, bIndex, hoverIndex].join('-');
+      if (onceInfo[0] && onceInfo[0] === k) {
+        return;
+      }
+      onceInfo[0] = k;
       props.onMoveCard(dragBIndex, dragIndex, bIndex, hoverIndex, hoverBoundingRect);
       return;
     }
@@ -72,12 +79,23 @@ const dTarget = {
 };
 
 class Card extends Component {
+  static propTypes = {
+    getCardHeight: PropTypes.func,
+  }
+  static defaultProps = {
+    getCardHeight: () => {},
+  }
   constructor(props) {
     super(props);
   }
 
+  componentDidMount() {
+    // console.log('cadr did mount', this.props.index, this.props.bIndex, findDOMNode(this).offsetHeight);
+    this.props.getCardHeight(findDOMNode(this).offsetHeight);
+  }
+
   render() {
-    const { prefixCls, placeholder, className, isDragging, isOver, content, connectDragSource, connectDropTarget } = this.props;
+    const { prefixCls, placeholder, className, style, isDragging, isOver, content, connectDragSource, connectDropTarget } = this.props;
     const cls = {
       [`${prefixCls}-card`]: true,
       [`${prefixCls}-card-placeholder`]: placeholder,
@@ -86,7 +104,7 @@ class Card extends Component {
     };
     return placeholder ? <div className={classNames(cls, className)}>{content}</div> :
       connectDragSource(connectDropTarget(
-      <div className={classNames(cls, className)}>
+      <div className={classNames(cls, className)} style={style}>
         {content}
       </div>
     ));

@@ -36,13 +36,14 @@ class Dnd extends Component {
 
   onEndDrag() {
     const blocks = [...this.props.data];
+    const rawIndex = phIndex[0] && [...phIndex[0]];
     this.resetPhIndex(blocks);
     // this.setState({blocks});
+    this.props.onEndDrag(blocks, rawIndex);
     hoverCardIndex = undefined;
     dropIndex = undefined;
     cardRect = undefined;
     enterB = undefined;
-    this.props.onEndDrag(blocks);
   }
 
   onMoveCard(dragBIndex, dragIndex, bIndex, hoverIndex, cr) {
@@ -56,7 +57,7 @@ class Dnd extends Component {
 
       this.resetPhIndex(blocks);
       // this.setState({blocks});
-      this.props.onMoveCard(blocks);
+      this.props.onMoveCard(blocks, 'across');
       return;
     }
 
@@ -90,9 +91,10 @@ class Dnd extends Component {
       blocks[bIndex].cards.splice(dropIndex, 0, {id: makeId(), _placeholder: true, content: ''});
       phIndex[0] = [bIndex, dropIndex];
       // this.setState({blocks});
-      this.props.onEnterBlock(blocks);
+      this.props.onEnterBlock(blocks, phIndex[0]);
     } else if (flag == 'drop') {
       if (!cardRect) {
+        // 如果不经过任何card，则放到block最后，替换掉占位符。
         dropIndex -= 1;
         dropIndex = dropIndex < 0 ? 0 : dropIndex;
       }
@@ -100,13 +102,13 @@ class Dnd extends Component {
       blocks[bIndex].cards[dropIndex] = removed[0];
       phIndex = [];
       // this.setState({blocks});
-      this.props.onDrop(blocks);
+      this.props.onDrop(blocks, {dragBIndex, dragIndex, bIndex, dropIndex});
     }
   }
 
   recursiveCloneChildren(children) {
     const props = this.props;
-    return React.Children.map(children, (child, index) => {
+    const newC = React.Children.map(children, (child, index) => {
       let childProps = {};
       if (React.isValidElement(child)) {
         if (child.type == Block) {
@@ -125,14 +127,14 @@ class Dnd extends Component {
           };
         }
       }
-      // console.log(child.props.children);
       if (child && child.props) {
         // null or String has no Prop
         childProps.children = this.recursiveCloneChildren(child.props.children);
         return React.cloneElement(child, childProps);
       }
       return child;
-    })
+    });
+    return newC;
   }
 
   render() {
