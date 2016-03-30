@@ -3,12 +3,19 @@ body > a {
 }
 .rci-dnd-block {
   border: 1px solid #ccc;
-  padding: 10px;
+  border-radius: 4px;
+  background-color: #ddd;
   margin: 0 10px 0 0;
 }
+.rci-dnd-block:first-child {
+  margin-left: 10px;
+}
 .rci-dnd-card {
-  border: 1px solid #ddd;
+  background-color: #fff;
   margin: 10px 0;
+}
+.rci-dnd-card-placeholder {
+  background-color: #fff!important;
 }
 .rci-dnd-card h3 {
   margin: 0 10px;
