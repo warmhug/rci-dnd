@@ -1595,7 +1595,7 @@ webpackJsonp([2],[
 	                      getCardHeight: _this4.getCardHeight.bind(_this4, index, i),
 	                      bIndex: index,
 	                      placeholder: card._placeholder,
-	                      content: card.content });
+	                      content: card._placeholder ? '' : card.content });
 	                  })
 	                )
 	              )
@@ -1816,11 +1816,12 @@ webpackJsonp([2],[
 	      }
 	      enterB = _indexs;
 	
+	      if (cardRect && (mouseOffset.y < cardRect.top || mouseOffset.y > cardRect.bottom)) {
+	        dropIndex = hoverCardIndex;
+	      }
 	      if (!cardRect) {
 	        // 如果不经过任何一个card，则放到最后
 	        dropIndex = this.props.data[bIndex].cards.length;
-	      } else if (mouseOffset.y < cardRect.top || mouseOffset.y > cardRect.bottom) {
-	        dropIndex = hoverCardIndex;
 	      }
 	
 	      if (flag === 'hover') {
@@ -9639,6 +9640,10 @@ webpackJsonp([2],[
 	    var clientOffset = monitor.getClientOffset();
 	
 	    // Determine rectangle on screen
+	    if (!component) {
+	      // why no component !!! ???
+	      return;
+	    }
 	    var hoverBoundingRect = (0, _reactDom.findDOMNode)(component).getBoundingClientRect();
 	
 	    if (dragBIndex !== bIndex) {
