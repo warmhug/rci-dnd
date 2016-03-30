@@ -74,8 +74,10 @@ class Dnd extends Component {
     }
 
     const blocks = [...this.props.data];
+    let _phIndex;
     if (enterB !== _indexs) {
       // 进入另一个block里
+      _phIndex = phIndex[0] && [...phIndex[0]];
       this.resetPhIndex(blocks);
     }
     enterB = _indexs;
@@ -91,7 +93,7 @@ class Dnd extends Component {
       blocks[bIndex].cards.splice(dropIndex, 0, {id: makeId(), _placeholder: true, content: ''});
       phIndex[0] = [bIndex, dropIndex];
       // this.setState({blocks});
-      this.props.onEnterBlock(blocks, phIndex[0]);
+      this.props.onEnterBlock(blocks, _phIndex ? [...phIndex[0], ..._phIndex] : phIndex[0]);
     } else if (flag == 'drop') {
       if (!cardRect) {
         // 如果不经过任何card，则放到block最后，替换掉占位符。

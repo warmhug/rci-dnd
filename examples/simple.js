@@ -16,7 +16,11 @@ function addData(flag) {
   var added = [];
   for (let i = 0; i < 10; i++) {
     _start++;
-    added.push({id: _start, content: `♘ ${_start}`, _height: parseInt(Math.random() * 20 + 20)});
+    added.push({
+      id: _start,
+      content: <div><h3>title</h3><p>♘ {_start}</p></div>,
+      _height: parseInt(Math.random() * 20 + 40)
+    });
   }
   // if (flag) {
     // _start += Date.now();
@@ -25,7 +29,7 @@ function addData(flag) {
 }
 
 let containerHeight = 250;
-let defaultElementHeight = 23;
+let defaultElementHeight = 50;
 let elementHeight =[];
 let cardsLen = 0;
 const cardsHeight = {};
@@ -137,6 +141,9 @@ class Demo extends Component {
     if (e === 'enterBlock') {
       // add placeholder height
       elementHeight[extra[0]].splice(extra[1], 0, defaultElementHeight);
+      if (extra.length === 4) {
+        elementHeight[extra[2]].splice(extra[3], 1);
+      }
     }
     if (e === 'drop') {
       const {dragBIndex, dragIndex, bIndex, dropIndex} = extra;
@@ -178,7 +185,8 @@ class Demo extends Component {
                 loadingSpinnerDelegate={<div className="infi-item">Loading...</div>}
                 isInfiniteLoading={isInfiniteLoading[index]}>
                 {block.cards.map((card, i) => {
-                  return (<Card key={card.id} index={i} ref={`block-${index}-card-${i}`}
+                  return (<Card key={card.id}
+                      id={card.id} index={i} ref={`block-${index}-card-${i}`}
                       style={{height: card._height}}
                       getCardHeight={this.getCardHeight.bind(this, index, i)}
                       bIndex={index}

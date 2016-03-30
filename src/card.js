@@ -9,9 +9,14 @@ let onceInfo = [];
 const dSource = {
   beginDrag(props) {
     return {
+      id: props.id,
       index: props.index,
       bIndex: props.bIndex
     };
+  },
+  isDragging: function (props, monitor) {
+    // 根据id 判断正在拖动的元素，这样Card可以被包裹在另外元素中
+    return monitor.getItem().id === props.id;
   },
   endDrag(props, monitor, component) {
     props.onEndDrag();
