@@ -191,7 +191,7 @@ class Demo extends Component {
                       getCardHeight={this.getCardHeight.bind(this, index, i)}
                       bIndex={index}
                       placeholder={card._placeholder}
-                      content={card.content} />)
+                      content={card._placeholder ? '' : card.content} />)
                 })}
               </Infinite>
             </div>

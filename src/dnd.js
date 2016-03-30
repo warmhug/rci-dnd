@@ -82,11 +82,12 @@ class Dnd extends Component {
     }
     enterB = _indexs;
 
+    if (cardRect && (mouseOffset.y < cardRect.top || mouseOffset.y > cardRect.bottom)) {
+      dropIndex = hoverCardIndex;
+    }
     if (!cardRect) {
       // 如果不经过任何一个card，则放到最后
       dropIndex = this.props.data[bIndex].cards.length;
-    } else if (mouseOffset.y < cardRect.top || mouseOffset.y > cardRect.bottom) {
-      dropIndex = hoverCardIndex;
     }
 
     if (flag === 'hover') {

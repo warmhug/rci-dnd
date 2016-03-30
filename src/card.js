@@ -41,6 +41,10 @@ const dTarget = {
     const clientOffset = monitor.getClientOffset();
 
     // Determine rectangle on screen
+    if (!component) {
+      // why no component !!! ???
+      return;
+    }
     const hoverBoundingRect = findDOMNode(component).getBoundingClientRect();
 
     if (dragBIndex !== bIndex) {
