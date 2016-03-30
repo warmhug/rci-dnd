@@ -1,6 +1,21 @@
 body > a {
   display: none;
 }
+.rci-dnd-block {
+  border: 1px solid #ccc;
+  padding: 10px;
+  margin: 0 10px 0 0;
+}
+.rci-dnd-card {
+  border: 1px solid #ddd;
+  margin: 10px 0;
+}
+.rci-dnd-card h3 {
+  margin: 0 10px;
+}
+.rci-dnd-card p {
+  margin: 5px 10px;
+}
 .infi {
   margin: 10px;
   border: 1px solid #ddd;

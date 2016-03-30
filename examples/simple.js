@@ -1352,7 +1352,25 @@ webpackJsonp([2],[
 	  var added = [];
 	  for (var i = 0; i < 10; i++) {
 	    _start++;
-	    added.push({ id: _start, content: '♘ ' + _start, _height: parseInt(Math.random() * 20 + 20) });
+	    added.push({
+	      id: _start,
+	      content: _react2["default"].createElement(
+	        'div',
+	        null,
+	        _react2["default"].createElement(
+	          'h3',
+	          null,
+	          'title'
+	        ),
+	        _react2["default"].createElement(
+	          'p',
+	          null,
+	          '♘ ',
+	          _start
+	        )
+	      ),
+	      _height: parseInt(Math.random() * 20 + 40)
+	    });
 	  }
 	  // if (flag) {
 	  // _start += Date.now();
@@ -1361,7 +1379,7 @@ webpackJsonp([2],[
 	}
 	
 	var containerHeight = 250;
-	var defaultElementHeight = 23;
+	var defaultElementHeight = 50;
 	var elementHeight = [];
 	var cardsLen = 0;
 	var cardsHeight = {};
@@ -1496,6 +1514,9 @@ webpackJsonp([2],[
 	      if (e === 'enterBlock') {
 	        // add placeholder height
 	        elementHeight[extra[0]].splice(extra[1], 0, defaultElementHeight);
+	        if (extra.length === 4) {
+	          elementHeight[extra[2]].splice(extra[3], 1);
+	        }
 	      }
 	      if (e === 'drop') {
 	        var dragBIndex = extra.dragBIndex;
@@ -1568,7 +1589,8 @@ webpackJsonp([2],[
 	                    ),
 	                    isInfiniteLoading: isInfiniteLoading[index] },
 	                  block.cards.map(function (card, i) {
-	                    return _react2["default"].createElement(Card, { key: card.id, index: i, ref: 'block-' + index + '-card-' + i,
+	                    return _react2["default"].createElement(Card, { key: card.id,
+	                      id: card.id, index: i, ref: 'block-' + index + '-card-' + i,
 	                      style: { height: card._height },
 	                      getCardHeight: _this4.getCardHeight.bind(_this4, index, i),
 	                      bIndex: index,
@@ -1786,8 +1808,10 @@ webpackJsonp([2],[
 	      }
 	
 	      var blocks = [].concat(_toConsumableArray(this.props.data));
+	      var _phIndex = void 0;
 	      if (enterB !== _indexs) {
 	        // 进入另一个block里
+	        _phIndex = phIndex[0] && [].concat(_toConsumableArray(phIndex[0]));
 	        this.resetPhIndex(blocks);
 	      }
 	      enterB = _indexs;
@@ -1803,7 +1827,7 @@ webpackJsonp([2],[
 	        blocks[bIndex].cards.splice(dropIndex, 0, { id: makeId(), _placeholder: true, content: '' });
 	        phIndex[0] = [bIndex, dropIndex];
 	        // this.setState({blocks});
-	        this.props.onEnterBlock(blocks, phIndex[0]);
+	        this.props.onEnterBlock(blocks, _phIndex ? [].concat(_toConsumableArray(phIndex[0]), _toConsumableArray(_phIndex)) : phIndex[0]);
 	      } else if (flag == 'drop') {
 	        if (!cardRect) {
 	          // 如果不经过任何card，则放到block最后，替换掉占位符。
@@ -9582,9 +9606,15 @@ webpackJsonp([2],[
 	var dSource = {
 	  beginDrag: function beginDrag(props) {
 	    return {
+	      id: props.id,
 	      index: props.index,
 	      bIndex: props.bIndex
 	    };
+	  },
+	
+	  isDragging: function isDragging(props, monitor) {
+	    // 根据id 判断正在拖动的元素，这样Card可以被包裹在另外元素中
+	    return monitor.getItem().id === props.id;
 	  },
 	  endDrag: function endDrag(props, monitor, component) {
 	    props.onEndDrag();

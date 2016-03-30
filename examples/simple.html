@@ -2,7 +2,7 @@
 <html>
 
 <head>
-  <title>simple.js - example - rci-dnd@0.4.0</title>
+  <title>simple.js - example - rci-dnd@0.4.1</title>
   <meta name="viewport"
         content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no">
   <meta charset="utf-8"/>
@@ -258,7 +258,7 @@ Monokai Sublime style. Derived from Monokai by noformnocontent http://nn.mit-lic
 <body>
   <div class="container">
     <div class="header">
-      <h1>rci-dnd@0.4.0</h1>
+      <h1>rci-dnd@0.4.1</h1>
 
       <p>dnd ui component for react</p>
     </div>
@@ -282,7 +282,11 @@ function addData(flag) {
   var added = [];
   for (let i = 0; i &lt; 10; i++) {
     _start++;
-    added.push({id: _start, content: `♘ ${_start}`, _height: parseInt(Math.random() * 20 + 20)});
+    added.push({
+      id: _start,
+      content: &lt;div&gt;&lt;h3&gt;title&lt;/h3&gt;&lt;p&gt;♘ {_start}&lt;/p&gt;&lt;/div&gt;,
+      _height: parseInt(Math.random() * 20 + 40)
+    });
   }
   // if (flag) {
     // _start += Date.now();
@@ -291,7 +295,7 @@ function addData(flag) {
 }
 
 let containerHeight = 250;
-let defaultElementHeight = 23;
+let defaultElementHeight = 50;
 let elementHeight =[];
 let cardsLen = 0;
 const cardsHeight = {};
@@ -403,6 +407,9 @@ class Demo extends Component {
     if (e === 'enterBlock') {
       // add placeholder height
       elementHeight[extra[0]].splice(extra[1], 0, defaultElementHeight);
+      if (extra.length === 4) {
+        elementHeight[extra[2]].splice(extra[3], 1);
+      }
     }
     if (e === 'drop') {
       const {dragBIndex, dragIndex, bIndex, dropIndex} = extra;
@@ -444,7 +451,8 @@ class Demo extends Component {
                 loadingSpinnerDelegate={&lt;div className="infi-item"&gt;Loading...&lt;/div&gt;}
                 isInfiniteLoading={isInfiniteLoading[index]}&gt;
                 {block.cards.map((card, i) =&gt; {
-                  return (&lt;Card key={card.id} index={i} ref={`block-${index}-card-${i}`}
+                  return (&lt;Card key={card.id}
+                      id={card.id} index={i} ref={`block-${index}-card-${i}`}
                       style={{height: card._height}}
                       getCardHeight={this.getCardHeight.bind(this, index, i)}
                       bIndex={index}
