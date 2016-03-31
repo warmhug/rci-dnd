@@ -1507,8 +1507,13 @@ webpackJsonp([2],[
 	    value: function onEndDrag(e, data, extra) {
 	      var elementHeight = [].concat(_toConsumableArray(this.state.elementHeight));
 	
-	      if (e === 'moveCard' && extra === 'across') {
-	        elementHeight = this.getNewInfiElementHeight(data);
+	      if (e === 'moveCard' && extra) {
+	        if (extra === 'across') {
+	          elementHeight = this.getNewInfiElementHeight(data);
+	        } else {
+	          // add placeholder height
+	          elementHeight[extra[0]].splice(extra[1], 0, defaultElementHeight);
+	        }
 	      }
 	
 	      if (e === 'enterBlock') {
@@ -1737,9 +1742,9 @@ webpackJsonp([2],[
 	
 	var hoverCardIndex = void 0;
 	var dropIndex = void 0;
-	var cardRect = void 0;
 	var enterB = void 0;
 	var phIndex = [];
+	var phObj = { id: makeId(), _placeholder: true, content: '' };
 	
 	var Dnd = function (_Component) {
 	  _inherits(Dnd, _Component);
@@ -1774,23 +1779,43 @@ webpackJsonp([2],[
 	      this.props.onEndDrag(blocks, rawIndex);
 	      hoverCardIndex = undefined;
 	      dropIndex = undefined;
-	      cardRect = undefined;
 	      enterB = undefined;
 	    }
 	  }, {
+	    key: 'onDrop',
+	    value: function onDrop(blocks, dragBIndex, dragIndex, bIndex, dropIndex) {
+	      var removed = blocks[dragBIndex].cards.splice(dragIndex, 1);
+	      blocks[bIndex].cards[dropIndex] = removed[0];
+	      phIndex = [];
+	      // this.setState({blocks});
+	      this.props.onDrop(blocks, { dragBIndex: dragBIndex, dragIndex: dragIndex, bIndex: bIndex, dropIndex: dropIndex });
+	    }
+	  }, {
 	    key: 'onMoveCard',
-	    value: function onMoveCard(dragBIndex, dragIndex, bIndex, hoverIndex, cr) {
+	    value: function onMoveCard(dragBIndex, dragIndex, bIndex, hoverIndex, extra) {
 	      var blocks = [].concat(_toConsumableArray(this.props.data));
+	
 	      if (dragBIndex !== bIndex) {
-	        enterB = false;
-	        hoverCardIndex = hoverIndex;
-	        if (!cardRect) {
-	          cardRect = cr;
+	        var direction = extra.direction || 0;
+	        if (extra.flag === 'drop') {
+	          this.onDrop(blocks, dragBIndex, dragIndex, bIndex, phIndex[0][1]);
 	        }
 	
+	        hoverCardIndex = hoverIndex;
 	        this.resetPhIndex(blocks);
-	        // this.setState({blocks});
+	        enterB = false;
 	        this.props.onMoveCard(blocks, 'across');
+	
+	        if (direction !== 0) {
+	          enterB = dragBIndex + '-' + bIndex;
+	          var phDropIndex = hoverIndex;
+	          if (direction > 0) {
+	            phDropIndex += 1;
+	          }
+	          blocks[bIndex].cards.splice(phDropIndex, 0, phObj);
+	          phIndex[0] = [bIndex, phDropIndex];
+	          this.props.onMoveCard(blocks, phIndex[0]);
+	        }
 	        return;
 	      }
 	
@@ -1816,30 +1841,30 @@ webpackJsonp([2],[
 	      }
 	      enterB = _indexs;
 	
-	      if (cardRect && (mouseOffset.y < cardRect.top || mouseOffset.y > cardRect.bottom)) {
-	        dropIndex = hoverCardIndex;
-	      }
-	      if (!cardRect) {
+	      if (hoverCardIndex == undefined) {
 	        // 如果不经过任何一个card，则放到最后
 	        dropIndex = this.props.data[bIndex].cards.length;
+	      } else {
+	        dropIndex = hoverCardIndex;
 	      }
 	
 	      if (flag === 'hover') {
-	        blocks[bIndex].cards.splice(dropIndex, 0, { id: makeId(), _placeholder: true, content: '' });
-	        phIndex[0] = [bIndex, dropIndex];
+	        if (!phIndex[0]) {
+	          blocks[bIndex].cards.splice(dropIndex, 0, phObj);
+	          phIndex[0] = [bIndex, dropIndex];
+	        }
 	        // this.setState({blocks});
 	        this.props.onEnterBlock(blocks, _phIndex ? [].concat(_toConsumableArray(phIndex[0]), _toConsumableArray(_phIndex)) : phIndex[0]);
 	      } else if (flag == 'drop') {
-	        if (!cardRect) {
+	        if (hoverCardIndex == undefined) {
 	          // 如果不经过任何card，则放到block最后，替换掉占位符。
 	          dropIndex -= 1;
 	          dropIndex = dropIndex < 0 ? 0 : dropIndex;
 	        }
-	        var removed = blocks[dragBIndex].cards.splice(dragIndex, 1);
-	        blocks[bIndex].cards[dropIndex] = removed[0];
-	        phIndex = [];
-	        // this.setState({blocks});
-	        this.props.onDrop(blocks, { dragBIndex: dragBIndex, dragIndex: dragIndex, bIndex: bIndex, dropIndex: dropIndex });
+	        if (phIndex[0]) {
+	          dropIndex = phIndex[0][1];
+	        }
+	        this.onDrop(blocks, dragBIndex, dragIndex, bIndex, dropIndex);
 	      }
 	    }
 	  }, {
@@ -9576,6 +9601,8 @@ webpackJsonp([2],[
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
+	var _udInfo;
+	
 	var _react = __webpack_require__(2);
 	
 	var _react2 = _interopRequireDefault(_react);
@@ -9594,15 +9621,20 @@ webpackJsonp([2],[
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 	
-	function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
-	
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 	
 	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
 	
 	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 	
+	function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
+	
+	function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+	
 	var onceInfo = [];
+	var UP = 'UP';
+	var DOWN = 'DOWN';
+	var udInfo = (_udInfo = {}, _defineProperty(_udInfo, UP, -1), _defineProperty(_udInfo, DOWN, 1), _udInfo);
 	
 	var dSource = {
 	  beginDrag: function beginDrag(props) {
@@ -9623,6 +9655,17 @@ webpackJsonp([2],[
 	};
 	
 	var dTarget = {
+	  drop: function drop(props, monitor, component) {
+	    var dragInfo = monitor.getItem();
+	    var dragIndex = dragInfo.index;
+	    var dragBIndex = dragInfo.bIndex;
+	
+	    var bIndex = props.bIndex;
+	
+	    if (onceInfo[0] && onceInfo[0].split('-').length === 5) {
+	      props.onMoveCard(dragBIndex, dragIndex, bIndex, props.index, { flag: 'drop' });
+	    }
+	  },
 	  hover: function hover(props, monitor, component) {
 	    var dragInfo = monitor.getItem();
 	    var dragIndex = dragInfo.index;
@@ -9641,26 +9684,37 @@ webpackJsonp([2],[
 	
 	    // Determine rectangle on screen
 	    if (!component) {
-	      // why no component !!! ???
+	      // why component maybe null !!! ???
 	      return;
 	    }
 	    var hoverBoundingRect = (0, _reactDom.findDOMNode)(component).getBoundingClientRect();
 	
+	    // Get pixels to the top
+	    var hoverClientY = clientOffset.y - hoverBoundingRect.top;
+	
 	    if (dragBIndex !== bIndex) {
-	      var k = [dragBIndex, dragIndex, bIndex, hoverIndex].join('-');
-	      if (onceInfo[0] && onceInfo[0] === k) {
+	      //三分之一
+	      var range = (hoverBoundingRect.bottom - hoverBoundingRect.top) / 3;
+	      var k = [dragBIndex, dragIndex, bIndex, hoverIndex];
+	      if (hoverClientY < range) {
+	        k = [].concat(_toConsumableArray(k), [UP]);
+	      }
+	      if (hoverClientY > 2 * range) {
+	        k = [].concat(_toConsumableArray(k), [DOWN]);
+	      }
+	      if (onceInfo[0] && onceInfo[0] === k.join('-')) {
 	        return;
 	      }
-	      onceInfo[0] = k;
-	      props.onMoveCard(dragBIndex, dragIndex, bIndex, hoverIndex, hoverBoundingRect);
+	      onceInfo[0] = k.join('-');
+	      props.onMoveCard(dragBIndex, dragIndex, bIndex, hoverIndex, {
+	        direction: udInfo[k[k.length - 1]],
+	        hoverBoundingRect: hoverBoundingRect
+	      });
 	      return;
 	    }
 	
 	    // Get vertical middle
 	    var hoverMiddleY = (hoverBoundingRect.bottom - hoverBoundingRect.top) / 2;
-	
-	    // Get pixels to the top
-	    var hoverClientY = clientOffset.y - hoverBoundingRect.top;
 	
 	    // Only perform the move when the mouse has crossed half of the items height
 	    // When dragging downwards, only move when the cursor is below 50%
