@@ -14,9 +14,9 @@ function makeId() {
 
 let hoverCardIndex;
 let dropIndex;
-let cardRect;
 let enterB;
 let phIndex = [];
+const phObj = {id: makeId(), _placeholder: true, content: ''};
 
 class Dnd extends Component {
   constructor(props) {
@@ -42,22 +42,41 @@ class Dnd extends Component {
     this.props.onEndDrag(blocks, rawIndex);
     hoverCardIndex = undefined;
     dropIndex = undefined;
-    cardRect = undefined;
     enterB = undefined;
   }
 
-  onMoveCard(dragBIndex, dragIndex, bIndex, hoverIndex, cr) {
+  onDrop(blocks, dragBIndex, dragIndex, bIndex, dropIndex) {
+    const removed = blocks[dragBIndex].cards.splice(dragIndex, 1);
+    blocks[bIndex].cards[dropIndex] = removed[0];
+    phIndex = [];
+    // this.setState({blocks});
+    this.props.onDrop(blocks, {dragBIndex, dragIndex, bIndex, dropIndex});
+  }
+
+  onMoveCard(dragBIndex, dragIndex, bIndex, hoverIndex, extra) {
     const blocks = [...this.props.data];
+
     if (dragBIndex !== bIndex) {
-      enterB = false;
-      hoverCardIndex = hoverIndex;
-      if (!cardRect) {
-        cardRect = cr;
+      const direction = extra.direction || 0;
+      if (extra.flag === 'drop') {
+        this.onDrop(blocks, dragBIndex, dragIndex, bIndex, phIndex[0][1]);
       }
 
+      hoverCardIndex = hoverIndex;
       this.resetPhIndex(blocks);
-      // this.setState({blocks});
+      enterB = false;
       this.props.onMoveCard(blocks, 'across');
+
+      if (direction !== 0) {
+        enterB = `${dragBIndex}-${bIndex}`;
+        let phDropIndex = hoverIndex;
+        if (direction > 0) {
+          phDropIndex += 1;
+        }
+        blocks[bIndex].cards.splice(phDropIndex, 0, phObj);
+        phIndex[0] = [bIndex, phDropIndex];
+        this.props.onMoveCard(blocks, phIndex[0]);
+      }
       return;
     }
 
@@ -82,30 +101,30 @@ class Dnd extends Component {
     }
     enterB = _indexs;
 
-    if (cardRect && (mouseOffset.y < cardRect.top || mouseOffset.y > cardRect.bottom)) {
-      dropIndex = hoverCardIndex;
-    }
-    if (!cardRect) {
+    if (hoverCardIndex == undefined) {
       // 如果不经过任何一个card，则放到最后
       dropIndex = this.props.data[bIndex].cards.length;
+    } else {
+      dropIndex = hoverCardIndex;
     }
 
     if (flag === 'hover') {
-      blocks[bIndex].cards.splice(dropIndex, 0, {id: makeId(), _placeholder: true, content: ''});
-      phIndex[0] = [bIndex, dropIndex];
+      if (!phIndex[0]) {
+        blocks[bIndex].cards.splice(dropIndex, 0, phObj);
+        phIndex[0] = [bIndex, dropIndex];
+      }
       // this.setState({blocks});
       this.props.onEnterBlock(blocks, _phIndex ? [...phIndex[0], ..._phIndex] : phIndex[0]);
     } else if (flag == 'drop') {
-      if (!cardRect) {
+      if (hoverCardIndex == undefined) {
         // 如果不经过任何card，则放到block最后，替换掉占位符。
         dropIndex -= 1;
         dropIndex = dropIndex < 0 ? 0 : dropIndex;
       }
-      const removed = blocks[dragBIndex].cards.splice(dragIndex, 1);
-      blocks[bIndex].cards[dropIndex] = removed[0];
-      phIndex = [];
-      // this.setState({blocks});
-      this.props.onDrop(blocks, {dragBIndex, dragIndex, bIndex, dropIndex});
+      if (phIndex[0]) {
+        dropIndex = phIndex[0][1];
+      }
+      this.onDrop(blocks, dragBIndex, dragIndex, bIndex, dropIndex);
     }
   }
 

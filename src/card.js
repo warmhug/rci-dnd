@@ -5,6 +5,12 @@ import flow from 'lodash/flow';
 import classNames from 'classnames';
 
 let onceInfo = [];
+const UP = 'UP';
+const DOWN = 'DOWN';
+const udInfo = {
+  [UP]: -1,
+  [DOWN]: 1,
+};
 
 const dSource = {
   beginDrag(props) {
@@ -24,6 +30,17 @@ const dSource = {
 };
 
 const dTarget = {
+  drop(props, monitor, component) {
+    const dragInfo = monitor.getItem();
+    const dragIndex = dragInfo.index;
+    const dragBIndex = dragInfo.bIndex;
+
+    const bIndex = props.bIndex;
+
+    if (onceInfo[0] && onceInfo[0].split('-').length === 5) {
+      props.onMoveCard(dragBIndex, dragIndex, bIndex, props.index, {flag: 'drop'});
+    }
+  },
   hover(props, monitor, component) {
     const dragInfo = monitor.getItem();
     const dragIndex = dragInfo.index;
@@ -42,26 +59,37 @@ const dTarget = {
 
     // Determine rectangle on screen
     if (!component) {
-      // why no component !!! ???
+      // why component maybe null !!! ???
       return;
     }
     const hoverBoundingRect = findDOMNode(component).getBoundingClientRect();
 
+    // Get pixels to the top
+    const hoverClientY = clientOffset.y - hoverBoundingRect.top;
+
     if (dragBIndex !== bIndex) {
-      const k = [dragBIndex, dragIndex, bIndex, hoverIndex].join('-');
-      if (onceInfo[0] && onceInfo[0] === k) {
+      //三分之一
+      const range = (hoverBoundingRect.bottom - hoverBoundingRect.top) / 3;
+      let k = [dragBIndex, dragIndex, bIndex, hoverIndex];
+      if (hoverClientY < range) {
+        k = [...k, UP];
+      }
+      if (hoverClientY > 2 * range) {
+        k = [...k, DOWN];
+      }
+      if (onceInfo[0] && onceInfo[0] === k.join('-')) {
         return;
       }
-      onceInfo[0] = k;
-      props.onMoveCard(dragBIndex, dragIndex, bIndex, hoverIndex, hoverBoundingRect);
+      onceInfo[0] = k.join('-');
+      props.onMoveCard(dragBIndex, dragIndex, bIndex, hoverIndex, {
+        direction: udInfo[k[k.length - 1]],
+        hoverBoundingRect,
+      });
       return;
     }
 
     // Get vertical middle
     const hoverMiddleY = (hoverBoundingRect.bottom - hoverBoundingRect.top) / 2;
-
-    // Get pixels to the top
-    const hoverClientY = clientOffset.y - hoverBoundingRect.top;
 
     // Only perform the move when the mouse has crossed half of the items height
     // When dragging downwards, only move when the cursor is below 50%

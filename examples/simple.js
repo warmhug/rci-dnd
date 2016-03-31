@@ -134,8 +134,13 @@ class Demo extends Component {
   onEndDrag(e, data, extra) {
     let elementHeight = [...this.state.elementHeight];
 
-    if (e === 'moveCard' && extra === 'across') {
-      elementHeight = this.getNewInfiElementHeight(data);
+    if (e === 'moveCard' && extra) {
+      if (extra === 'across') {
+        elementHeight = this.getNewInfiElementHeight(data);
+      } else {
+        // add placeholder height
+        elementHeight[extra[0]].splice(extra[1], 0, defaultElementHeight);
+      }
     }
 
     if (e === 'enterBlock') {
